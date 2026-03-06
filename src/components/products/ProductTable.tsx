@@ -8,29 +8,51 @@ import {
     ArrowDown,
     AlertTriangle,
     Filter,
+    Plus,
+    Pencil,
+    Trash2,
 } from "lucide-react";
 import clsx from "clsx";
-import {
-    sampleProducts,
-    LOW_STOCK_THRESHOLD,
-    getCategories,
-    type Product,
-} from "@/src/data/sampleProducts";
+import { useAuth } from "@/src/context/AuthContext";
+import { LOW_STOCK_THRESHOLD, getCategories, type Product } from "@/src/data/sampleProducts";
+import ProductModal from "./ProductModal";
 
 type SortKey = keyof Pick<Product, "name" | "category" | "price" | "stock">;
 type SortDir = "asc" | "desc";
 
-export default function ProductTable() {
+interface ProductTableProps {
+    products: Product[];
+    onAddProduct: (product: Product) => void;
+    onEditProduct: (product: Product) => void;
+    onDeleteProduct: (id: string) => void;
+}
+
+export default function ProductTable({
+    products,
+    onAddProduct,
+    onEditProduct,
+    onDeleteProduct,
+}: ProductTableProps) {
+    const { user } = useAuth();
+    const isManager = user?.role === "Manager";
+
     const [search, setSearch] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("All");
     const [sortKey, setSortKey] = useState<SortKey>("name");
     const [sortDir, setSortDir] = useState<SortDir>("asc");
 
+    // Modal state
+    const [modalOpen, setModalOpen] = useState(false);
+    const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+    // Delete confirmation
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+
     const categories = useMemo(() => ["All", ...getCategories()], []);
 
     // Filter + sort
     const filtered = useMemo(() => {
-        let list = sampleProducts;
+        let list = products;
 
         // Search
         if (search.trim()) {
@@ -62,7 +84,7 @@ export default function ProductTable() {
         });
 
         return sorted;
-    }, [search, categoryFilter, sortKey, sortDir]);
+    }, [products, search, categoryFilter, sortKey, sortDir]);
 
     function toggleSort(key: SortKey) {
         if (sortKey === key) {
@@ -71,6 +93,29 @@ export default function ProductTable() {
             setSortKey(key);
             setSortDir("asc");
         }
+    }
+
+    function handleAdd() {
+        setEditingProduct(null);
+        setModalOpen(true);
+    }
+
+    function handleEdit(product: Product) {
+        setEditingProduct(product);
+        setModalOpen(true);
+    }
+
+    function handleSave(product: Product) {
+        if (editingProduct) {
+            onEditProduct(product);
+        } else {
+            onAddProduct(product);
+        }
+    }
+
+    function handleDeleteConfirm(id: string) {
+        onDeleteProduct(id);
+        setDeletingId(null);
     }
 
     function SortIcon({ col }: { col: SortKey }) {
@@ -107,37 +152,53 @@ export default function ProductTable() {
                     />
                 </div>
 
-                {/* Category filter */}
-                <div className="flex items-center gap-2">
-                    <Filter className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                    <select
-                        id="category-filter"
-                        value={categoryFilter}
-                        onChange={(e) => setCategoryFilter(e.target.value)}
-                        className={clsx(
-                            "rounded-xl border px-3 py-2 text-sm outline-none transition-all",
-                            "bg-white dark:bg-gray-800/50",
-                            "text-gray-700 dark:text-gray-200",
-                            "border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200",
-                            "dark:border-gray-700 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/40"
-                        )}
-                    >
-                        {categories.map((c) => (
-                            <option key={c} value={c}>
-                                {c}
-                            </option>
-                        ))}
-                    </select>
-                    <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">
-                        {filtered.length} result{filtered.length !== 1 ? "s" : ""}
-                    </span>
+                {/* Right side: filter + add button */}
+                <div className="flex items-center gap-3">
+                    {/* Category filter */}
+                    <div className="flex items-center gap-2">
+                        <Filter className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                        <select
+                            id="category-filter"
+                            value={categoryFilter}
+                            onChange={(e) => setCategoryFilter(e.target.value)}
+                            className={clsx(
+                                "rounded-xl border px-3 py-2 text-sm outline-none transition-all",
+                                "bg-white dark:bg-gray-800/50",
+                                "text-gray-700 dark:text-gray-200",
+                                "border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200",
+                                "dark:border-gray-700 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/40"
+                            )}
+                        >
+                            {categories.map((c) => (
+                                <option key={c} value={c}>
+                                    {c}
+                                </option>
+                            ))}
+                        </select>
+                        <span className="text-xs text-gray-400 dark:text-gray-500">
+                            {filtered.length} result{filtered.length !== 1 ? "s" : ""}
+                        </span>
+                    </div>
+
+                    {/* Add Product — Manager only */}
+                    {isManager && (
+                        <button
+                            type="button"
+                            id="add-product-btn"
+                            onClick={handleAdd}
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all hover:shadow-lg hover:shadow-indigo-500/30 active:scale-[0.98]"
+                        >
+                            <Plus className="h-4 w-4" />
+                            Add Product
+                        </button>
+                    )}
                 </div>
             </div>
 
             {/* ─── Table ───────────────────────────────────────────── */}
             <div className="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800">
                 <div className="overflow-x-auto">
-                    <table className="w-full min-w-[700px] text-left text-sm">
+                    <table className="w-full min-w-[800px] text-left text-sm">
                         <thead>
                             <tr className="border-b border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900/60">
                                 <Th>ID</Th>
@@ -155,13 +216,14 @@ export default function ProductTable() {
                                 </ThSortable>
                                 <Th>Supplier</Th>
                                 <Th>Updated</Th>
+                                <Th>Actions</Th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 bg-white dark:divide-gray-800 dark:bg-gray-900">
                             {filtered.length === 0 ? (
                                 <tr>
                                     <td
-                                        colSpan={7}
+                                        colSpan={8}
                                         className="px-4 py-12 text-center text-gray-400 dark:text-gray-500"
                                     >
                                         No products match your search.
@@ -170,10 +232,17 @@ export default function ProductTable() {
                             ) : (
                                 filtered.map((p) => {
                                     const isLow = p.stock < LOW_STOCK_THRESHOLD;
+                                    const isDeleting = deletingId === p.id;
+
                                     return (
                                         <tr
                                             key={p.id}
-                                            className="transition-colors hover:bg-gray-50/60 dark:hover:bg-gray-800/40"
+                                            className={clsx(
+                                                "transition-colors",
+                                                isDeleting
+                                                    ? "bg-red-50/60 dark:bg-red-900/10"
+                                                    : "hover:bg-gray-50/60 dark:hover:bg-gray-800/40"
+                                            )}
                                         >
                                             <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-gray-500 dark:text-gray-400">
                                                 {p.id}
@@ -192,7 +261,11 @@ export default function ProductTable() {
                                                 </span>
                                             </td>
                                             <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
-                                                ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                $
+                                                {p.price.toLocaleString(undefined, {
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2,
+                                                })}
                                             </td>
                                             <td className="px-4 py-3">
                                                 <span
@@ -203,9 +276,7 @@ export default function ProductTable() {
                                                             : "text-gray-700 dark:text-gray-300"
                                                     )}
                                                 >
-                                                    {isLow && (
-                                                        <AlertTriangle className="h-3.5 w-3.5" />
-                                                    )}
+                                                    {isLow && <AlertTriangle className="h-3.5 w-3.5" />}
                                                     {p.stock.toLocaleString()} {p.unit}
                                                 </span>
                                             </td>
@@ -215,6 +286,51 @@ export default function ProductTable() {
                                             <td className="whitespace-nowrap px-4 py-3 text-gray-400 dark:text-gray-500">
                                                 {p.lastUpdated}
                                             </td>
+                                            <td className="px-4 py-3">
+                                                {isDeleting ? (
+                                                    /* Delete confirmation inline */
+                                                    <div className="flex items-center gap-1.5">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleDeleteConfirm(p.id)}
+                                                            className="rounded-lg bg-red-500 px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-red-600"
+                                                        >
+                                                            Confirm
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setDeletingId(null)}
+                                                            className="rounded-lg px-2.5 py-1 text-xs font-medium text-gray-500 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-1">
+                                                        {/* Edit — both roles can edit */}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleEdit(p)}
+                                                            className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/20 dark:hover:text-indigo-400"
+                                                            title="Edit product"
+                                                        >
+                                                            <Pencil className="h-4 w-4" />
+                                                        </button>
+
+                                                        {/* Delete — Manager only */}
+                                                        {isManager && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setDeletingId(p.id)}
+                                                                className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+                                                                title="Delete product"
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </td>
                                         </tr>
                                     );
                                 })
@@ -223,6 +339,17 @@ export default function ProductTable() {
                     </table>
                 </div>
             </div>
+
+            {/* ─── Product Modal ───────────────────────────────────── */}
+            <ProductModal
+                isOpen={modalOpen}
+                onClose={() => {
+                    setModalOpen(false);
+                    setEditingProduct(null);
+                }}
+                onSave={handleSave}
+                product={editingProduct}
+            />
         </div>
     );
 }

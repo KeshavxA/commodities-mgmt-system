@@ -1,16 +1,20 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/src/context/AuthContext";
 import Navbar from "@/src/components/layout/Navbar";
 import Sidebar from "@/src/components/layout/Sidebar";
 import ProductTable from "@/src/components/products/ProductTable";
+import { sampleProducts, type Product } from "@/src/data/sampleProducts";
 import { Boxes } from "lucide-react";
 
 export default function CommoditiesPage() {
     const { user, isAuthenticated } = useAuth();
     const router = useRouter();
+
+    // ─── Products state (initialised from sample data) ─────
+    const [products, setProducts] = useState<Product[]>(sampleProducts);
 
     // Redirect to login if not authenticated
     useEffect(() => {
@@ -20,6 +24,21 @@ export default function CommoditiesPage() {
     }, [isAuthenticated, router]);
 
     if (!isAuthenticated || !user) return null;
+
+    // ─── CRUD handlers ──────────────────────────────────────
+    function handleAdd(product: Product) {
+        setProducts((prev) => [...prev, product]);
+    }
+
+    function handleEdit(updated: Product) {
+        setProducts((prev) =>
+            prev.map((p) => (p.id === updated.id ? updated : p))
+        );
+    }
+
+    function handleDelete(id: string) {
+        setProducts((prev) => prev.filter((p) => p.id !== id));
+    }
 
     return (
         <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950">
@@ -40,14 +59,19 @@ export default function CommoditiesPage() {
                                     Commodities
                                 </h1>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                                    Browse and search all commodity products
+                                    Browse, search, and manage commodity products
                                 </p>
                             </div>
                         </div>
                     </div>
 
                     {/* Product Table */}
-                    <ProductTable />
+                    <ProductTable
+                        products={products}
+                        onAddProduct={handleAdd}
+                        onEditProduct={handleEdit}
+                        onDeleteProduct={handleDelete}
+                    />
                 </main>
             </div>
         </div>
