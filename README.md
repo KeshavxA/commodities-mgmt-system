@@ -1,36 +1,109 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏭 Commodities Management System
 
-## Getting Started
+A full-featured **Commodities Management System** built with **Next.js 16**, **TypeScript**, and **Tailwind CSS**. The application provides role-based access control with separate views for **Managers** and **Store Keepers** to manage products/commodities efficiently.
 
-First, run the development server:
+## 🚀 Live Demo
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+> **Deployed on Vercel**: [commodities-mgmt-system.vercel.app](https://commodities-mgmt-system.vercel.app)
+
+---
+
+## 🔐 Login Credentials
+
+| Role          | Email                  | Password   |
+| ------------- | ---------------------- | ---------- |
+| **Manager**   | admin@example.com      | password   |
+| **Store Keeper** | staff@example.com   | password   |
+
+### Role Permissions
+
+- **Manager**: Full access — Dashboard, Products/Commodities management (CRUD), and analytics.
+- **Store Keeper**: Limited access — Products/Commodities view and management.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS 4
+- **Icons**: Lucide React
+- **State Management**: React Context API
+- **GraphQL Client**: Apollo Client
+- **Utilities**: clsx, tailwind-merge
+
+---
+
+## 📦 Getting Started
+
+### Prerequisites
+
+- **Node.js** ≥ 18.x
+- **npm** ≥ 9.x
+
+### Installation & Running Locally
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/KeshavxA/commodities-mgmt-system.git
+   cd commodities-mgmt-system
+   ```
+
+2. **Install dependencies & start the dev server**:
+   ```bash
+   npm install && npm run dev
+   ```
+
+3. **Open your browser** at [http://localhost:3000](http://localhost:3000)
+
+---
+
+## 📁 Project Structure
+
+```
+commodities-mgmt-system/
+├── app/                    # Next.js App Router pages
+│   ├── login/              # Login page
+│   ├── dashboard/          # Manager dashboard
+│   ├── commodities/        # Commodities management page
+│   └── layout.tsx          # Root layout
+├── src/
+│   ├── components/         # Reusable UI components
+│   │   ├── auth/           # Authentication guards
+│   │   ├── layout/         # Sidebar, Navbar
+│   │   └── products/       # Product table, modals
+│   ├── context/            # React Context providers (Auth, Theme)
+│   ├── data/               # Sample/mock data
+│   ├── lib/                # Utility libraries (Apollo client)
+│   └── types/              # TypeScript type definitions
+├── public/                 # Static assets
+└── package.json
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🎨 Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- ✅ **Authentication** — Login with role-based access (Manager / Store Keeper)
+- ✅ **Role-Based Navigation** — Sidebar dynamically shows menu items based on user role
+- ✅ **Dashboard** — Analytics overview (Manager only)
+- ✅ **Commodities Management** — Full CRUD operations for products
+- ✅ **Responsive Design** — Works on desktop and mobile
+- ✅ **Dark/Light Theme** — Theme toggle support
+- ✅ **Logout** — Secure session clearing with redirect to login
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🚢 Deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This project is deployed on **Vercel**:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Connect your GitHub repo to [Vercel](https://vercel.com)
+2. Vercel auto-detects Next.js and configures the build
+3. Push to `main` to trigger automatic deployments
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📄 License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is built as part of a hiring assessment.
