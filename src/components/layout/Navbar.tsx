@@ -36,7 +36,7 @@ export default function Navbar() {
     }
 
     return (
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white/80 px-6 backdrop-blur-md dark:border-gray-800 dark:bg-gray-900/80">
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white/80 pl-14 pr-6 backdrop-blur-md dark:border-gray-800 dark:bg-gray-900/80 lg:px-6">
             <div className="flex items-center gap-3">
                 <span className="text-sm font-medium capitalize text-gray-500 dark:text-gray-400">
                     {getTitleFromPath(pathname)}
@@ -98,7 +98,7 @@ export default function Navbar() {
 
                         {dropdownOpen && (
                             <div className="absolute right-0 mt-2 w-56 origin-top-right animate-in rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg dark:border-gray-700 dark:bg-gray-800">
-                               
+
                                 <div className="border-b border-gray-100 px-3 py-2.5 dark:border-gray-700">
                                     <p className="text-sm font-medium text-gray-900 dark:text-white">
                                         {user.email}

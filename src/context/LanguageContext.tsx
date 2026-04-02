@@ -37,6 +37,7 @@ const translations = {
     admin: "Admin",
     logout: "Logout",
     groupByCategory: "Group by category",
+    results: "results",
   },
   de: {
     home: "Startseite",
@@ -49,6 +50,7 @@ const translations = {
     admin: "Admin",
     logout: "Abmelden",
     groupByCategory: "Nach Kategorie gruppieren",
+    results: "Ergebnisse",
   },
   fr: {
     home: "Accueil",
@@ -61,6 +63,7 @@ const translations = {
     admin: "Admin",
     logout: "Déconnexion",
     groupByCategory: "Grouper par catégorie",
+    results: "résultats",
   },
 } as const;
 

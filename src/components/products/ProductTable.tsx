@@ -168,33 +168,33 @@ export default function ProductTable({
                     />
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <div className="flex flex-col items-end gap-2 text-right">
-                        <div className="flex items-center gap-2">
-                            <Filter className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                            <select
-                                id="category-filter"
-                                value={categoryFilter}
-                                onChange={(e) => setCategoryFilter(e.target.value)}
-                                className={clsx(
-                                    "rounded-xl border px-3 py-2 text-sm outline-none transition-all",
-                                    "bg-white dark:bg-gray-800/50",
-                                    "text-gray-700 dark:text-gray-200",
-                                    "border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200",
-                                    "dark:border-gray-700 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/40"
-                                )}
-                            >
-                                {categories.map((c) => (
-                                    <option key={c} value={c}>
-                                        {translateCategory(c)}
-                                    </option>
-                                ))}
-                            </select>
-                            <span className="text-xs text-gray-400 dark:text-gray-500">
-                                {filtered.length} result{filtered.length !== 1 ? "s" : ""}
-                            </span>
-                        </div>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <div className="flex items-center gap-2">
+                        <Filter className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                        <select
+                            id="category-filter"
+                            value={categoryFilter}
+                            onChange={(e) => setCategoryFilter(e.target.value)}
+                            className={clsx(
+                                "flex-1 rounded-xl border px-3 py-2 text-sm outline-none transition-all sm:flex-none",
+                                "bg-white dark:bg-gray-800/50",
+                                "text-gray-700 dark:text-gray-200",
+                                "border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200",
+                                "dark:border-gray-700 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/40"
+                            )}
+                        >
+                            {categories.map((c) => (
+                                <option key={c} value={c}>
+                                    {translateCategory(c)}
+                                </option>
+                            ))}
+                        </select>
+                        <span className="whitespace-nowrap text-xs text-gray-400 dark:text-gray-500">
+                            {filtered.length} {t("results")}
+                        </span>
+                    </div>
 
+                    <div className="flex items-center justify-between gap-3 sm:justify-start">
                         <button
                             type="button"
                             id="groupby-toggle"
@@ -220,32 +220,44 @@ export default function ProductTable({
                                 />
                             </span>
                         </button>
-                    </div>
 
-                    {isManager && (
-                        <button
-                            type="button"
-                            id="add-product-btn"
-                            onClick={handleAdd}
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all hover:shadow-lg hover:shadow-indigo-500/30 active:scale-[0.98]"
-                        >
-                            <Plus className="h-4 w-4" />
-                            Add Product
-                        </button>
-                    )}
+                        {isManager && (
+                            <button
+                                type="button"
+                                id="add-product-btn-mobile"
+                                onClick={handleAdd}
+                                className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all hover:shadow-lg hover:shadow-indigo-500/30 active:scale-[0.98] sm:hidden"
+                            >
+                                <Plus className="h-4 w-4" />
+                                Add
+                            </button>
+                        )}
+                    </div>
                 </div>
+
+                {isManager && (
+                    <button
+                        type="button"
+                        id="add-product-btn"
+                        onClick={handleAdd}
+                        className="hidden items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all hover:shadow-lg hover:shadow-indigo-500/30 active:scale-[0.98] sm:inline-flex"
+                    >
+                        <Plus className="h-4 w-4" />
+                        Add Product
+                    </button>
+                )}
             </div>
 
             <div className="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800">
                 <div className="overflow-x-auto">
-                    <table className="w-full min-w-[800px] text-left text-sm">
+                    <table className="w-full min-w-[500px] text-left text-sm sm:min-w-[700px] md:min-w-[800px]">
                         <thead>
                             <tr className="border-b border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900/60">
-                                <Th>ID</Th>
+                                <Th className="hidden sm:table-cell">ID</Th>
                                 <ThSortable col="name" label="Product" toggle={toggleSort}>
                                     <SortIcon col="name" />
                                 </ThSortable>
-                                <ThSortable col="category" label="Category" toggle={toggleSort}>
+                                <ThSortable col="category" label="Category" toggle={toggleSort} className="hidden md:table-cell">
                                     <SortIcon col="category" />
                                 </ThSortable>
                                 <ThSortable col="price" label="Price" toggle={toggleSort}>
@@ -254,8 +266,8 @@ export default function ProductTable({
                                 <ThSortable col="stock" label="Stock" toggle={toggleSort}>
                                     <SortIcon col="stock" />
                                 </ThSortable>
-                                <Th>Supplier</Th>
-                                <Th>Updated</Th>
+                                <Th className="hidden lg:table-cell">Supplier</Th>
+                                <Th className="hidden xl:table-cell">Updated</Th>
                                 <Th>Actions</Th>
                             </tr>
                         </thead>
@@ -323,13 +335,13 @@ export default function ProductTable({
                                                                     : "hover:bg-gray-50/60 dark:hover:bg-gray-800/40"
                                                             )}
                                                         >
-                                                            <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-gray-500 dark:text-gray-400">
+                                                            <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-gray-500 dark:text-gray-400 hidden sm:table-cell">
                                                                 {p.id}
                                                             </td>
-                                                            <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">
+                                                            <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100 max-w-[140px] sm:max-w-none break-words">
                                                                 {translateProductName(p.id, p.name)}
                                                             </td>
-                                                            <td className="px-4 py-3">
+                                                            <td className="px-4 py-3 hidden md:table-cell">
                                                                 <span
                                                                     className={clsx(
                                                                         "inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium",
@@ -361,10 +373,10 @@ export default function ProductTable({
                                                                     {p.stock.toLocaleString()} {p.unit}
                                                                 </span>
                                                             </td>
-                                                            <td className="px-4 py-3 text-gray-500 dark:text-gray-400">
+                                                            <td className="px-4 py-3 text-gray-500 dark:text-gray-400 hidden lg:table-cell">
                                                                 {p.supplier}
                                                             </td>
-                                                            <td className="whitespace-nowrap px-4 py-3 text-gray-400 dark:text-gray-500">
+                                                            <td className="whitespace-nowrap px-4 py-3 text-gray-400 dark:text-gray-500 hidden xl:table-cell">
                                                                 {p.lastUpdated}
                                                             </td>
                                                             <td className="px-4 py-3">
@@ -430,13 +442,13 @@ export default function ProductTable({
                                                     : "hover:bg-gray-50/60 dark:hover:bg-gray-800/40"
                                             )}
                                         >
-                                            <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-gray-500 dark:text-gray-400">
+                                            <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-gray-500 dark:text-gray-400 hidden sm:table-cell">
                                                 {p.id}
                                             </td>
-                                            <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">
+                                            <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100 max-w-[140px] sm:max-w-none break-words">
                                                 {translateProductName(p.id, p.name)}
                                             </td>
-                                            <td className="px-4 py-3">
+                                            <td className="px-4 py-3 hidden md:table-cell">
                                                 <span
                                                     className={clsx(
                                                         "inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium",
@@ -466,10 +478,10 @@ export default function ProductTable({
                                                     {p.stock.toLocaleString()} {p.unit}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 text-gray-500 dark:text-gray-400">
+                                            <td className="px-4 py-3 text-gray-500 dark:text-gray-400 hidden lg:table-cell">
                                                 {p.supplier}
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-3 text-gray-400 dark:text-gray-500">
+                                            <td className="whitespace-nowrap px-4 py-3 text-gray-400 dark:text-gray-500 hidden xl:table-cell">
                                                 {p.lastUpdated}
                                             </td>
                                             <td className="px-4 py-3">
@@ -537,9 +549,9 @@ export default function ProductTable({
 }
 
 
-function Th({ children }: { children: React.ReactNode }) {
+function Th({ children, className }: { children: React.ReactNode; className?: string }) {
     return (
-        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+        <th className={clsx("px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400", className)}>
             {children}
         </th>
     );
@@ -550,14 +562,16 @@ function ThSortable({
     label,
     toggle,
     children,
+    className,
 }: {
     col: SortKey;
     label: string;
     toggle: (key: SortKey) => void;
     children: React.ReactNode;
+    className?: string;
 }) {
     return (
-        <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+        <th className={clsx("px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400", className)}>
             <button
                 type="button"
                 onClick={() => toggle(col)}
