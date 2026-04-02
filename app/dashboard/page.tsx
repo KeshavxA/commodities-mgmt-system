@@ -31,8 +31,6 @@ export default function DashboardPage() {
 
 function DashboardContent() {
     const { user } = useAuth();
-
-    // ─── Real stats computed from sample data ──────────────
     const totalProducts = getTotalProducts();
     const lowStockItems = getLowStockProducts();
     const totalValue = getTotalValue();
@@ -52,7 +50,6 @@ function DashboardContent() {
                 <Navbar />
 
                 <main className="flex-1 p-6 lg:p-8">
-                    {/* Page header */}
                     <div className="mb-8">
                         <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                             Dashboard
@@ -69,7 +66,6 @@ function DashboardContent() {
                         </p>
                     </div>
 
-                    {/* ─── Stats Grid ───────────────────────────────────── */}
                     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                         <StatCard
                             icon={<Package className="h-5 w-5" />}
@@ -101,7 +97,6 @@ function DashboardContent() {
                         />
                     </div>
 
-                    {/* ─── Low-Stock Alert Banner ───────────────────────── */}
                     {lowStockItems.length > 0 && (
                         <div className="mt-6 rounded-2xl border border-red-200 bg-red-50/50 p-4 dark:border-red-900/50 dark:bg-red-900/10">
                             <div className="flex items-start gap-3">
@@ -121,7 +116,6 @@ function DashboardContent() {
                         </div>
                     )}
 
-                    {/* ─── Top Commodities Table ────────────────────────── */}
                     <div className="mt-8">
                         <div className="mb-4 flex items-center gap-2">
                             <BarChart3 className="h-5 w-5 text-gray-400 dark:text-gray-500" />
@@ -190,18 +184,17 @@ function DashboardContent() {
                                                     </td>
                                                 </tr>
                                             ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+                                           </tbody>
+                                  </table>
+                                 </div>
+                             </div>
+                           </div>
                 </main>
             </div>
         </div>
     );
 }
 
-/* ─── Stat Card ───────────────────────────────────────────── */
 type CardColor = "indigo" | "emerald" | "amber" | "red";
 
 const colorMap: Record<CardColor, { bg: string; icon: string }> = {

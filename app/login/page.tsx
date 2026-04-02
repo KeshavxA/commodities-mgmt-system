@@ -4,6 +4,7 @@ import { useState, useEffect, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth, MOCK_USERS } from "@/src/context/AuthContext";
 import { Package, Mail, Lock, LogIn, Eye, EyeOff } from "lucide-react";
+import ThemeToggle from "@/src/components/ui/ThemeToggle";
 import clsx from "clsx";
 
 export default function LoginPage() {
@@ -16,7 +17,6 @@ export default function LoginPage() {
     const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Redirect if already authenticated
     useEffect(() => {
         if (isAuthenticated) {
             router.replace("/dashboard");
@@ -26,14 +26,14 @@ export default function LoginPage() {
     function validate(): boolean {
         const newErrors: typeof errors = {};
 
-        // Email validation
+
         if (!email.trim()) {
             newErrors.email = "Email is required";
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             newErrors.email = "Enter a valid email address";
         }
 
-        // Password validation
+
         if (!password.trim()) {
             newErrors.password = "Password is required";
         } else if (password.length < 6) {
@@ -51,7 +51,6 @@ export default function LoginPage() {
         setIsSubmitting(true);
         setErrors({});
 
-        // Simulate network delay
         await new Promise((r) => setTimeout(r, 800));
 
         const mockUser = MOCK_USERS[email.toLowerCase()];
@@ -68,7 +67,9 @@ export default function LoginPage() {
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-950 dark:via-gray-900 dark:to-indigo-950 px-4">
-            {/* Decorative background elements */}
+            <div className="absolute right-4 top-4 z-10 sm:right-8 sm:top-8">
+                <ThemeToggle />
+            </div>
             <div className="pointer-events-none fixed inset-0 overflow-hidden">
                 <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-indigo-400/20 blur-3xl dark:bg-indigo-600/10" />
                 <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-blue-400/20 blur-3xl dark:bg-blue-600/10" />
@@ -76,9 +77,8 @@ export default function LoginPage() {
             </div>
 
             <div className="relative w-full max-w-md">
-                {/* Card */}
                 <div className="rounded-2xl border border-white/60 bg-white/70 p-8 shadow-2xl shadow-indigo-500/10 backdrop-blur-xl dark:border-white/10 dark:bg-gray-900/70 dark:shadow-indigo-500/5">
-                    {/* Logo & Header */}
+
                     <div className="mb-8 text-center">
                         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/30">
                             <Package className="h-7 w-7 text-white" />
@@ -91,16 +91,13 @@ export default function LoginPage() {
                         </p>
                     </div>
 
-                    {/* General error */}
                     {errors.general && (
                         <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800/50 dark:bg-red-900/20 dark:text-red-400">
                             {errors.general}
                         </div>
                     )}
 
-                    {/* Form */}
                     <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-                        {/* Email */}
                         <div>
                             <label
                                 htmlFor="login-email"
@@ -136,7 +133,6 @@ export default function LoginPage() {
                             )}
                         </div>
 
-                        {/* Password */}
                         <div>
                             <label
                                 htmlFor="login-password"
@@ -180,7 +176,6 @@ export default function LoginPage() {
                             )}
                         </div>
 
-                        {/* Submit */}
                         <button
                             id="login-submit"
                             type="submit"
@@ -204,7 +199,6 @@ export default function LoginPage() {
                         </button>
                     </form>
 
-                    {/* Divider */}
                     <div className="my-6 flex items-center gap-3">
                         <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
                         <span className="text-xs font-medium text-gray-400 dark:text-gray-500">
@@ -212,8 +206,6 @@ export default function LoginPage() {
                         </span>
                         <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
                     </div>
-
-                    {/* Demo credentials */}
                     <div className="space-y-2.5">
                         <DemoCredential
                             role="Manager"
@@ -238,7 +230,6 @@ export default function LoginPage() {
                     </div>
                 </div>
 
-                {/* Footer */}
                 <p className="mt-6 text-center text-xs text-gray-400 dark:text-gray-500">
                     Commodities Management System &copy; {new Date().getFullYear()}
                 </p>
@@ -247,7 +238,7 @@ export default function LoginPage() {
     );
 }
 
-/* ─── Helper component ──────────────────────────────────── */
+
 function DemoCredential({
     role,
     email,

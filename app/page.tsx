@@ -4,12 +4,6 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/src/context/AuthContext";
 
-/**
- * Root page – redirects based on auth state and role:
- * - Not authenticated → /login
- * - Manager           → /dashboard
- * - StoreKeeper       → /commodities
- */
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();

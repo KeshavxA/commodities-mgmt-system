@@ -1,15 +1,23 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Sun, Moon } from "lucide-react";
 import { useTheme } from "@/src/context/ThemeContext";
 import clsx from "clsx";
 
-/**
- * An animated Sun / Moon toggle that switches and persists
- * the application theme via ThemeContext.
- */
+
 export default function ThemeToggle() {
     const { theme, toggleTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) {
+        return <div className="h-9 w-[4.25rem]" />;
+    }
+
     const isDark = theme === "dark";
 
     return (
@@ -29,7 +37,7 @@ export default function ThemeToggle() {
                 "cursor-pointer shadow-md hover:shadow-lg"
             )}
         >
-            {/* Sliding knob */}
+
             <span
                 className={clsx(
                     "absolute left-1 flex h-7 w-7 items-center justify-center rounded-full",
@@ -44,7 +52,6 @@ export default function ThemeToggle() {
                 )}
             </span>
 
-            {/* Background icons (faded, opposite of active) */}
             <span className="pointer-events-none absolute inset-0 flex items-center justify-between px-2.5">
                 <Sun
                     className={clsx(

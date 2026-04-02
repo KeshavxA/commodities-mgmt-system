@@ -9,7 +9,6 @@ export interface Product {
     lastUpdated: string;
 }
 
-/** Threshold below which a product is considered "low stock" */
 export const LOW_STOCK_THRESHOLD = 50;
 
 export const sampleProducts: Product[] = [
@@ -215,7 +214,6 @@ export const sampleProducts: Product[] = [
     },
 ];
 
-// ─── Computed helpers ────────────────────────────────────
 export function getTotalProducts(): number {
     return sampleProducts.length;
 }

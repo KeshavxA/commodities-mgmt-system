@@ -13,10 +13,8 @@ export default function CommoditiesPage() {
     const { user, isAuthenticated } = useAuth();
     const router = useRouter();
 
-    // ─── Products state (initialised from sample data) ─────
     const [products, setProducts] = useState<Product[]>(sampleProducts);
 
-    // Redirect to login if not authenticated
     useEffect(() => {
         if (!isAuthenticated) {
             router.replace("/login");
@@ -25,7 +23,6 @@ export default function CommoditiesPage() {
 
     if (!isAuthenticated || !user) return null;
 
-    // ─── CRUD handlers ──────────────────────────────────────
     function handleAdd(product: Product) {
         setProducts((prev) => [...prev, product]);
     }
@@ -48,7 +45,6 @@ export default function CommoditiesPage() {
                 <Navbar />
 
                 <main className="flex-1 p-6 lg:p-8">
-                    {/* Page header */}
                     <div className="mb-6">
                         <div className="flex items-center gap-3">
                             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-900/20">
@@ -65,7 +61,6 @@ export default function CommoditiesPage() {
                         </div>
                     </div>
 
-                    {/* Product Table */}
                     <ProductTable
                         products={products}
                         onAddProduct={handleAdd}

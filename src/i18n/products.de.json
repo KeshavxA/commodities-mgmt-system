@@ -1,0 +1,32 @@
+{
+  "categories": {
+    "Energy": "Energie",
+    "Metals": "Metalle",
+    "Agriculture": "Landwirtschaft",
+    "Soft Commodities": "Weiche Rohstoffe",
+    "Industrial": "Industriell"
+  },
+  "products": {
+    "COM-001": "Rohöl (Brent)",
+    "COM-002": "Erdgas",
+    "COM-003": "Gold (24 Karat)",
+    "COM-004": "Silber",
+    "COM-005": "Kupfer",
+    "COM-006": "Weizen (HRW)",
+    "COM-007": "Mais",
+    "COM-008": "Sojabohnen",
+    "COM-009": "Baumwolle",
+    "COM-010": "Kaffee (Arabica)",
+    "COM-011": "Zucker #11",
+    "COM-012": "Platin",
+    "COM-013": "Palladium",
+    "COM-014": "Bauholz",
+    "COM-015": "Eisenerz",
+    "COM-016": "Lithiumcarbonat",
+    "COM-017": "Kakao",
+    "COM-018": "Reis (Rough)",
+    "COM-019": "Aluminium",
+    "COM-020": "Nickel"
+  }
+}
+

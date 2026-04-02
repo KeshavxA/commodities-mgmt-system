@@ -1,0 +1,32 @@
+{
+  "categories": {
+    "Energy": "Energy",
+    "Metals": "Metals",
+    "Agriculture": "Agriculture",
+    "Soft Commodities": "Soft commodities",
+    "Industrial": "Industrial"
+  },
+  "products": {
+    "COM-001": "Crude Oil (Brent)",
+    "COM-002": "Natural Gas",
+    "COM-003": "Gold (24K)",
+    "COM-004": "Silver",
+    "COM-005": "Copper",
+    "COM-006": "Wheat (HRW)",
+    "COM-007": "Corn",
+    "COM-008": "Soybeans",
+    "COM-009": "Cotton",
+    "COM-010": "Coffee (Arabica)",
+    "COM-011": "Sugar #11",
+    "COM-012": "Platinum",
+    "COM-013": "Palladium",
+    "COM-014": "Lumber",
+    "COM-015": "Iron Ore",
+    "COM-016": "Lithium Carbonate",
+    "COM-017": "Cocoa",
+    "COM-018": "Rice (Rough)",
+    "COM-019": "Aluminum",
+    "COM-020": "Nickel"
+  }
+}
+

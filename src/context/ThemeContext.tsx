@@ -70,17 +70,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }, []);
 
 
-    if (!mounted) {
-        return (
-            <ThemeContext.Provider value={{ theme: "light", toggleTheme, setTheme }}>
-                <div style={{ visibility: "hidden" }}>{children}</div>
-            </ThemeContext.Provider>
-        );
-    }
-
     return (
         <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
-            {children}
+            <div className={!mounted ? "invisible" : ""}>
+                {children}
+            </div>
         </ThemeContext.Provider>
     );
 }

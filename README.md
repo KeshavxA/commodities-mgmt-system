@@ -106,4 +106,4 @@ This project is deployed on **Vercel**:
 
 ## 📄 License
 
-This project is built as part of a hiring assessment.
+This project is built by Keshav Sharma.

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { Fragment, useMemo, useState } from "react";
 import {
     Search,
     ArrowUpDown,
@@ -11,9 +11,12 @@ import {
     Plus,
     Pencil,
     Trash2,
+    ChevronDown,
+    ChevronRight,
 } from "lucide-react";
 import clsx from "clsx";
 import { useAuth } from "@/src/context/AuthContext";
+import { useLanguage } from "@/src/context/LanguageContext";
 import { LOW_STOCK_THRESHOLD, getCategories, type Product } from "@/src/data/sampleProducts";
 import ProductModal from "./ProductModal";
 
@@ -34,27 +37,23 @@ export default function ProductTable({
     onDeleteProduct,
 }: ProductTableProps) {
     const { user } = useAuth();
+    const { t, translateCategory, translateProductName } = useLanguage();
     const isManager = user?.role === "Manager";
 
     const [search, setSearch] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("All");
+    const [groupByCategory, setGroupByCategory] = useState(false);
     const [sortKey, setSortKey] = useState<SortKey>("name");
     const [sortDir, setSortDir] = useState<SortDir>("asc");
-
-    // Modal state
     const [modalOpen, setModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
-    // Delete confirmation
     const [deletingId, setDeletingId] = useState<string | null>(null);
-
+    const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
     const categories = useMemo(() => ["All", ...getCategories()], []);
-
-    // Filter + sort
     const filtered = useMemo(() => {
         let list = products;
 
-        // Search
         if (search.trim()) {
             const q = search.toLowerCase();
             list = list.filter(
@@ -66,12 +65,10 @@ export default function ProductTable({
             );
         }
 
-        // Category
         if (categoryFilter !== "All") {
             list = list.filter((p) => p.category === categoryFilter);
         }
 
-        // Sort
         const sorted = [...list].sort((a, b) => {
             const aVal = a[sortKey];
             const bVal = b[sortKey];
@@ -86,6 +83,20 @@ export default function ProductTable({
         return sorted;
     }, [products, search, categoryFilter, sortKey, sortDir]);
 
+    const groupedByCategory = useMemo<Record<string, Product[]> | null>(() => {
+        if (!groupByCategory) return null;
+
+        const groups: Record<string, Product[]> = {};
+        for (const p of filtered) {
+            if (!groups[p.category]) groups[p.category] = [];
+            groups[p.category].push(p);
+        }
+
+        return groups;
+    }, [filtered, groupByCategory]);
+
+    const groupedEntries = groupedByCategory ? Object.entries(groupedByCategory) : [];
+
     function toggleSort(key: SortKey) {
         if (sortKey === key) {
             setSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -93,6 +104,13 @@ export default function ProductTable({
             setSortKey(key);
             setSortDir("asc");
         }
+    }
+
+    function toggleGroup(category: string) {
+        setOpenGroups((prev) => ({
+            ...prev,
+            [category]: !(prev[category] ?? true),
+        }));
     }
 
     function handleAdd() {
@@ -130,9 +148,7 @@ export default function ProductTable({
 
     return (
         <div>
-            {/* ─── Toolbar ─────────────────────────────────────────── */}
             <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                {/* Search */}
                 <div className="relative w-full sm:max-w-xs">
                     <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                     <input
@@ -152,35 +168,60 @@ export default function ProductTable({
                     />
                 </div>
 
-                {/* Right side: filter + add button */}
                 <div className="flex items-center gap-3">
-                    {/* Category filter */}
-                    <div className="flex items-center gap-2">
-                        <Filter className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                        <select
-                            id="category-filter"
-                            value={categoryFilter}
-                            onChange={(e) => setCategoryFilter(e.target.value)}
-                            className={clsx(
-                                "rounded-xl border px-3 py-2 text-sm outline-none transition-all",
-                                "bg-white dark:bg-gray-800/50",
-                                "text-gray-700 dark:text-gray-200",
-                                "border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200",
-                                "dark:border-gray-700 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/40"
-                            )}
+                    <div className="flex flex-col items-end gap-2 text-right">
+                        <div className="flex items-center gap-2">
+                            <Filter className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                            <select
+                                id="category-filter"
+                                value={categoryFilter}
+                                onChange={(e) => setCategoryFilter(e.target.value)}
+                                className={clsx(
+                                    "rounded-xl border px-3 py-2 text-sm outline-none transition-all",
+                                    "bg-white dark:bg-gray-800/50",
+                                    "text-gray-700 dark:text-gray-200",
+                                    "border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200",
+                                    "dark:border-gray-700 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/40"
+                                )}
+                            >
+                                {categories.map((c) => (
+                                    <option key={c} value={c}>
+                                        {translateCategory(c)}
+                                    </option>
+                                ))}
+                            </select>
+                            <span className="text-xs text-gray-400 dark:text-gray-500">
+                                {filtered.length} result{filtered.length !== 1 ? "s" : ""}
+                            </span>
+                        </div>
+
+                        <button
+                            type="button"
+                            id="groupby-toggle"
+                            onClick={() => setGroupByCategory((v) => !v)}
+                            className="inline-flex items-center gap-2 text-xs font-medium text-gray-500 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100"
+                            role="switch"
+                            aria-checked={groupByCategory}
                         >
-                            {categories.map((c) => (
-                                <option key={c} value={c}>
-                                    {c}
-                                </option>
-                            ))}
-                        </select>
-                        <span className="text-xs text-gray-400 dark:text-gray-500">
-                            {filtered.length} result{filtered.length !== 1 ? "s" : ""}
-                        </span>
+                            <span>{t("groupByCategory")}</span>
+                            <span
+                                className={clsx(
+                                    "inline-flex h-5 w-9 items-center rounded-full border border-transparent p-0.5 transition-colors",
+                                    groupByCategory
+                                        ? "bg-indigo-500"
+                                        : "bg-gray-300 dark:bg-gray-700"
+                                )}
+                            >
+                                <span
+                                    className={clsx(
+                                        "h-4 w-4 rounded-full bg-white shadow transition-transform",
+                                        groupByCategory ? "translate-x-4" : "translate-x-0"
+                                    )}
+                                />
+                            </span>
+                        </button>
                     </div>
 
-                    {/* Add Product — Manager only */}
                     {isManager && (
                         <button
                             type="button"
@@ -195,7 +236,6 @@ export default function ProductTable({
                 </div>
             </div>
 
-            {/* ─── Table ───────────────────────────────────────────── */}
             <div className="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800">
                 <div className="overflow-x-auto">
                     <table className="w-full min-w-[800px] text-left text-sm">
@@ -229,6 +269,152 @@ export default function ProductTable({
                                         No products match your search.
                                     </td>
                                 </tr>
+                            ) : groupByCategory && groupedEntries.length > 0 ? (
+                                groupedEntries.map(([category, items]) => {
+                                    const isOpen = openGroups[category] ?? true;
+                                    const totalProducts = items.length;
+
+                                    return (
+                                        <Fragment key={category}>
+                                            <tr className="border-b border-gray-100 bg-gray-50/80 dark:border-gray-800 dark:bg-gray-900/60">
+                                                <td colSpan={8} className="px-4 py-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => toggleGroup(category)}
+                                                        className="flex w-full items-center justify-between text-left text-sm font-semibold text-gray-700 transition-colors hover:text-gray-900 dark:text-gray-200 dark:hover:text-gray-50"
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+                                                                {isOpen ? (
+                                                                    <ChevronDown className="h-4 w-4" />
+                                                                ) : (
+                                                                    <ChevronRight className="h-4 w-4" />
+                                                                )}
+                                                            </span>
+                                                            <span
+                                                                className={clsx(
+                                                                    "inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium",
+                                                                    categoryBadge(category)
+                                                                )}
+                                                            >
+                                                                {category}
+                                                            </span>
+                                                        </div>
+                                                        <span className="text-xs font-normal text-gray-500 dark:text-gray-400">
+                                                            {totalProducts} product
+                                                            {totalProducts !== 1 ? "s" : ""}
+                                                        </span>
+                                                    </button>
+                                                </td>
+                                            </tr>
+
+                                            {isOpen &&
+                                                items.map((p) => {
+                                                    const isLow = p.stock < LOW_STOCK_THRESHOLD;
+                                                    const isDeleting = deletingId === p.id;
+
+                                                    return (
+                                                        <tr
+                                                            key={p.id}
+                                                            className={clsx(
+                                                                "transition-colors",
+                                                                isDeleting
+                                                                    ? "bg-red-50/60 dark:bg-red-900/10"
+                                                                    : "hover:bg-gray-50/60 dark:hover:bg-gray-800/40"
+                                                            )}
+                                                        >
+                                                            <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-gray-500 dark:text-gray-400">
+                                                                {p.id}
+                                                            </td>
+                                                            <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">
+                                                                {translateProductName(p.id, p.name)}
+                                                            </td>
+                                                            <td className="px-4 py-3">
+                                                                <span
+                                                                    className={clsx(
+                                                                        "inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium",
+                                                                        categoryBadge(p.category)
+                                                                    )}
+                                                                >
+                                                                    {translateCategory(p.category)}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
+                                                                $
+                                                                {p.price.toLocaleString(undefined, {
+                                                                    minimumFractionDigits: 2,
+                                                                    maximumFractionDigits: 2,
+                                                                })}
+                                                            </td>
+                                                            <td className="px-4 py-3">
+                                                                <span
+                                                                    className={clsx(
+                                                                        "inline-flex items-center gap-1 font-medium",
+                                                                        isLow
+                                                                            ? "text-red-600 dark:text-red-400"
+                                                                            : "text-gray-700 dark:text-gray-300"
+                                                                    )}
+                                                                >
+                                                                    {isLow && (
+                                                                        <AlertTriangle className="h-3.5 w-3.5" />
+                                                                    )}
+                                                                    {p.stock.toLocaleString()} {p.unit}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-4 py-3 text-gray-500 dark:text-gray-400">
+                                                                {p.supplier}
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-4 py-3 text-gray-400 dark:text-gray-500">
+                                                                {p.lastUpdated}
+                                                            </td>
+                                                            <td className="px-4 py-3">
+                                                                {isDeleting ? (
+                                                                    <div className="flex items-center gap-1.5">
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => handleDeleteConfirm(p.id)}
+                                                                            className="rounded-lg bg-red-500 px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-red-600"
+                                                                        >
+                                                                            Confirm
+                                                                        </button>
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => setDeletingId(null)}
+                                                                            className="rounded-lg px-2.5 py-1 text-xs font-medium text-gray-500 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+                                                                        >
+                                                                            Cancel
+                                                                        </button>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="flex items-center gap-1">
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => handleEdit(p)}
+                                                                            className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/20 dark:hover:text-indigo-400"
+                                                                            title="Edit product"
+                                                                        >
+                                                                            <Pencil className="h-4 w-4" />
+                                                                        </button>
+
+                                                                        {isManager && (
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => setDeletingId(p.id)}
+                                                                                className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+                                                                                title="Delete product"
+                                                                            >
+                                                                                <Trash2 className="h-4 w-4" />
+                                                                            </button>
+                                                                        )}
+                                                                    </div>
+                                                                )}
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                        </Fragment>
+                                    );
+                                })
                             ) : (
                                 filtered.map((p) => {
                                     const isLow = p.stock < LOW_STOCK_THRESHOLD;
@@ -248,7 +434,7 @@ export default function ProductTable({
                                                 {p.id}
                                             </td>
                                             <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">
-                                                {p.name}
+                                                {translateProductName(p.id, p.name)}
                                             </td>
                                             <td className="px-4 py-3">
                                                 <span
@@ -257,7 +443,7 @@ export default function ProductTable({
                                                         categoryBadge(p.category)
                                                     )}
                                                 >
-                                                    {p.category}
+                                                    {translateCategory(p.category)}
                                                 </span>
                                             </td>
                                             <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
@@ -288,7 +474,6 @@ export default function ProductTable({
                                             </td>
                                             <td className="px-4 py-3">
                                                 {isDeleting ? (
-                                                    /* Delete confirmation inline */
                                                     <div className="flex items-center gap-1.5">
                                                         <button
                                                             type="button"
@@ -307,7 +492,6 @@ export default function ProductTable({
                                                     </div>
                                                 ) : (
                                                     <div className="flex items-center gap-1">
-                                                        {/* Edit — both roles can edit */}
                                                         <button
                                                             type="button"
                                                             onClick={() => handleEdit(p)}
@@ -317,7 +501,6 @@ export default function ProductTable({
                                                             <Pencil className="h-4 w-4" />
                                                         </button>
 
-                                                        {/* Delete — Manager only */}
                                                         {isManager && (
                                                             <button
                                                                 type="button"
@@ -340,7 +523,6 @@ export default function ProductTable({
                 </div>
             </div>
 
-            {/* ─── Product Modal ───────────────────────────────────── */}
             <ProductModal
                 isOpen={modalOpen}
                 onClose={() => {
@@ -354,7 +536,6 @@ export default function ProductTable({
     );
 }
 
-/* ─── Helpers ──────────────────────────────────────────────── */
 
 function Th({ children }: { children: React.ReactNode }) {
     return (

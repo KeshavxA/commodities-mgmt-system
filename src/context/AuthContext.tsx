@@ -10,7 +10,7 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 
-// ─── Types ───────────────────────────────────────────────
+
 export type UserRole = "Manager" | "StoreKeeper";
 
 export interface User {
@@ -25,7 +25,6 @@ interface AuthContextType {
     logout: () => void;
 }
 
-// ─── Mock credentials for validation ─────────────────────
 const MOCK_USERS: Record<string, { password: string; role: UserRole }> = {
     "manager@commodities.com": { password: "manager123", role: "Manager" },
     "storekeeper@commodities.com": {
@@ -36,7 +35,6 @@ const MOCK_USERS: Record<string, { password: string; role: UserRole }> = {
 
 export { MOCK_USERS };
 
-// ─── Context ─────────────────────────────────────────────
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const STORAGE_KEY = "commodities-auth-user";
@@ -46,7 +44,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [mounted, setMounted] = useState(false);
     const router = useRouter();
 
-    // Hydrate from localStorage on first client render
     useEffect(() => {
         try {
             const stored = localStorage.getItem(STORAGE_KEY);
@@ -78,7 +75,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         router.push("/login");
     }, [router]);
 
-    // Don't render anything meaningful until after hydration
     if (!mounted) {
         return null;
     }
@@ -97,10 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
 }
 
-/**
- * Hook to consume auth state and helpers.
- * Must be called inside an <AuthProvider>.
- */
+
 export function useAuth(): AuthContextType {
     const ctx = useContext(AuthContext);
     if (!ctx) {

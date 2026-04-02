@@ -1,0 +1,32 @@
+{
+  "categories": {
+    "Energy": "Énergie",
+    "Metals": "Métaux",
+    "Agriculture": "Agriculture",
+    "Soft Commodities": "Produits doux",
+    "Industrial": "Industriel"
+  },
+  "products": {
+    "COM-001": "Pétrole brut (Brent)",
+    "COM-002": "Gaz naturel",
+    "COM-003": "Or (24 carats)",
+    "COM-004": "Argent",
+    "COM-005": "Cuivre",
+    "COM-006": "Blé (HRW)",
+    "COM-007": "Maïs",
+    "COM-008": "Soja",
+    "COM-009": "Coton",
+    "COM-010": "Café (Arabica)",
+    "COM-011": "Sucre #11",
+    "COM-012": "Platine",
+    "COM-013": "Palladium",
+    "COM-014": "Bois d'œuvre",
+    "COM-015": "Minerai de fer",
+    "COM-016": "Carbonate de lithium",
+    "COM-017": "Cacao",
+    "COM-018": "Riz (Rough)",
+    "COM-019": "Aluminium",
+    "COM-020": "Nickel"
+  }
+}
+

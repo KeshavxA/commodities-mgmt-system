@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/src/context/AuthContext";
+import { useLanguage } from "@/src/context/LanguageContext";
 import ThemeToggle from "@/src/components/ui/ThemeToggle";
 import { LogOut, User, ChevronDown } from "lucide-react";
 import clsx from "clsx";
@@ -10,11 +11,11 @@ import { useState, useRef, useEffect } from "react";
 
 export default function Navbar() {
     const { user, logout } = useAuth();
+    const { language, setLanguage, t } = useLanguage();
     const pathname = usePathname();
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // Close dropdown on outside click
     useEffect(() => {
         function handleClick(e: MouseEvent) {
             if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -25,20 +26,44 @@ export default function Navbar() {
         return () => document.removeEventListener("mousedown", handleClick);
     }, []);
 
+    function getTitleFromPath(path: string): string {
+        if (path === "/") return t("home");
+        if (path.startsWith("/dashboard")) return t("dashboard");
+        if (path.startsWith("/commodities")) return t("commodities");
+        if (path.startsWith("/orders")) return t("orders");
+        if (path.startsWith("/settings")) return t("settings");
+        return path.replace("/", "");
+    }
+
     return (
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white/80 px-6 backdrop-blur-md dark:border-gray-800 dark:bg-gray-900/80">
-            {/* Left: breadcrumb-like current page */}
             <div className="flex items-center gap-3">
                 <span className="text-sm font-medium capitalize text-gray-500 dark:text-gray-400">
-                    {pathname === "/" ? "Home" : pathname.replace("/", "")}
+                    {getTitleFromPath(pathname)}
                 </span>
             </div>
 
-            {/* Right: actions */}
             <div className="flex items-center gap-4">
+                <div className="relative">
+                    <select
+                        id="language-select"
+                        value={language}
+                        onChange={(e) =>
+                            setLanguage(e.target.value as "en" | "de" | "fr")
+                        }
+                        className={clsx(
+                            "rounded-xl border px-2 py-1 text-xs font-medium outline-none transition-colors",
+                            "bg-white/80 text-gray-700 border-gray-200 hover:border-indigo-400 dark:bg-gray-900/80 dark:text-gray-200 dark:border-gray-700 dark:hover:border-indigo-500"
+                        )}
+                    >
+                        <option value="en">English</option>
+                        <option value="de">Deutsch</option>
+                        <option value="fr">Français</option>
+                    </select>
+                </div>
+
                 <ThemeToggle />
 
-                {/* User dropdown */}
                 {user && (
                     <div ref={dropdownRef} className="relative">
                         <button
@@ -71,10 +96,9 @@ export default function Navbar() {
                             />
                         </button>
 
-                        {/* Dropdown */}
                         {dropdownOpen && (
                             <div className="absolute right-0 mt-2 w-56 origin-top-right animate-in rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg dark:border-gray-700 dark:bg-gray-800">
-                                {/* User info */}
+                               
                                 <div className="border-b border-gray-100 px-3 py-2.5 dark:border-gray-700">
                                     <p className="text-sm font-medium text-gray-900 dark:text-white">
                                         {user.email}
@@ -91,7 +115,6 @@ export default function Navbar() {
                                     </p>
                                 </div>
 
-                                {/* Links */}
                                 <div className="py-1">
                                     <Link
                                         href="/dashboard"
@@ -99,11 +122,10 @@ export default function Navbar() {
                                         className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700/50"
                                     >
                                         <User className="h-4 w-4" />
-                                        Profile
+                                        {t("profile")}
                                     </Link>
                                 </div>
 
-                                {/* Logout */}
                                 <div className="border-t border-gray-100 pt-1 dark:border-gray-700">
                                     <button
                                         id="logout-button"
@@ -115,7 +137,7 @@ export default function Navbar() {
                                         className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
                                     >
                                         <LogOut className="h-4 w-4" />
-                                        Sign out
+                                        {t("signOut")}
                                     </button>
                                 </div>
                             </div>

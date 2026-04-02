@@ -4,12 +4,12 @@ import { useState, useEffect, type FormEvent } from "react";
 import { X } from "lucide-react";
 import clsx from "clsx";
 import { getCategories, type Product } from "@/src/data/sampleProducts";
+import { useLanguage } from "@/src/context/LanguageContext";
 
 interface ProductModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSave: (product: Product) => void;
-    /** If provided, we're editing; otherwise we're adding */
     product?: Product | null;
 }
 
@@ -22,6 +22,7 @@ export default function ProductModal({
     product,
 }: ProductModalProps) {
     const isEdit = !!product;
+    const { translateCategory } = useLanguage();
 
     const [form, setForm] = useState({
         name: "",
@@ -34,7 +35,6 @@ export default function ProductModal({
 
     const [errors, setErrors] = useState<Record<string, string>>({});
 
-    // Pre-fill form when editing
     useEffect(() => {
         if (product) {
             setForm({
@@ -102,15 +102,12 @@ export default function ProductModal({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-            {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/40 backdrop-blur-sm"
                 onClick={onClose}
             />
 
-            {/* Modal */}
             <div className="relative mx-4 w-full max-w-lg animate-in fade-in zoom-in-95 rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl dark:border-gray-700 dark:bg-gray-900">
-                {/* Header */}
                 <div className="mb-5 flex items-center justify-between">
                     <h2 className="text-lg font-bold text-gray-900 dark:text-white">
                         {isEdit ? "Edit Product" : "Add New Product"}
@@ -125,9 +122,7 @@ export default function ProductModal({
                     </button>
                 </div>
 
-                {/* Form */}
                 <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-                    {/* Name */}
                     <Field
                         id="product-name"
                         label="Product Name"
@@ -137,7 +132,6 @@ export default function ProductModal({
                         placeholder="e.g. Gold (24K)"
                     />
 
-                    {/* Category */}
                     <div>
                         <label
                             htmlFor="product-category"
@@ -161,7 +155,7 @@ export default function ProductModal({
                         >
                             {categories.map((c) => (
                                 <option key={c} value={c}>
-                                    {c}
+                                    {translateCategory(c)}
                                 </option>
                             ))}
                         </select>
@@ -170,7 +164,6 @@ export default function ProductModal({
                         )}
                     </div>
 
-                    {/* Price + Stock row */}
                     <div className="grid grid-cols-2 gap-4">
                         <Field
                             id="product-price"
@@ -194,7 +187,6 @@ export default function ProductModal({
                         />
                     </div>
 
-                    {/* Unit + Supplier row */}
                     <div className="grid grid-cols-2 gap-4">
                         <Field
                             id="product-unit"
@@ -214,7 +206,6 @@ export default function ProductModal({
                         />
                     </div>
 
-                    {/* Actions */}
                     <div className="flex items-center justify-end gap-3 pt-2">
                         <button
                             type="button"
@@ -238,7 +229,6 @@ export default function ProductModal({
     );
 }
 
-/* ─── Reusable Field ─────────────────────────────────────── */
 function Field({
     id,
     label,
