@@ -38,6 +38,7 @@ const translations = {
     logout: "Logout",
     groupByCategory: "Group by category",
     results: "results",
+    auditLogs: "Audit Logs",
   },
   de: {
     home: "Startseite",
@@ -51,6 +52,7 @@ const translations = {
     logout: "Abmelden",
     groupByCategory: "Nach Kategorie gruppieren",
     results: "Ergebnisse",
+    auditLogs: "Audit-Protokolle",
   },
   fr: {
     home: "Accueil",
@@ -64,6 +66,7 @@ const translations = {
     logout: "Déconnexion",
     groupByCategory: "Grouper par catégorie",
     results: "résultats",
+    auditLogs: "Journaux d'audit",
   },
 } as const;
 

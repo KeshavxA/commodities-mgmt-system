@@ -9,6 +9,7 @@ import {
     LayoutDashboard,
     Boxes,
     ClipboardList,
+    ClipboardCheck,
     Settings,
     ChevronLeft,
     LogOut,
@@ -41,6 +42,13 @@ const navigation = [
         href: "/orders",
         icon: ClipboardList,
         managerOnly: false,
+    },
+    {
+        key: "auditLogs",
+        name: "Audit Logs",
+        href: "/audit-logs",
+        icon: ClipboardCheck,
+        managerOnly: true,
     },
     {
         key: "settings",

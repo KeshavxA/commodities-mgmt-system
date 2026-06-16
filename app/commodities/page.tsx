@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/src/context/AuthContext";
+import { useAudit } from "@/src/context/AuditContext";
 import Navbar from "@/src/components/layout/Navbar";
 import Sidebar from "@/src/components/layout/Sidebar";
 import ProductTable from "@/src/components/products/ProductTable";
@@ -11,6 +12,7 @@ import { Boxes } from "lucide-react";
 
 export default function CommoditiesPage() {
     const { user, isAuthenticated } = useAuth();
+    const { logAction } = useAudit();
     const router = useRouter();
 
     const [products, setProducts] = useState<Product[]>(sampleProducts);
@@ -25,15 +27,21 @@ export default function CommoditiesPage() {
 
     function handleAdd(product: Product) {
         setProducts((prev) => [...prev, product]);
+        logAction("CREATE", `Created product "${product.name}" (${product.id})`, user!);
     }
 
     function handleEdit(updated: Product) {
         setProducts((prev) =>
             prev.map((p) => (p.id === updated.id ? updated : p))
         );
+        logAction("UPDATE", `Updated product "${updated.name}" (${updated.id})`, user!);
     }
 
     function handleDelete(id: string) {
+        const product = products.find((p) => p.id === id);
+        if (product) {
+            logAction("DELETE", `Deleted product "${product.name}" (${id})`, user!);
+        }
         setProducts((prev) => prev.filter((p) => p.id !== id));
     }
 
