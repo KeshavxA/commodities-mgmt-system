@@ -4,8 +4,9 @@ import RoleGuard from "@/src/components/auth/RoleGuard";
 import Navbar from "@/src/components/layout/Navbar";
 import Sidebar from "@/src/components/layout/Sidebar";
 import { useAudit } from "@/src/context/AuditContext";
-import { ClipboardCheck } from "lucide-react";
+import { ClipboardCheck, Download } from "lucide-react";
 import clsx from "clsx";
+import { exportAuditLogsToCSV } from "@/src/utils/exportUtils";
 
 export default function AuditLogsPage() {
     return (
@@ -48,18 +49,29 @@ function AuditLogsContent() {
 
                 <main className="flex-1 p-6 lg:p-8">
                     <div className="mb-6">
-                        <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-900/20 shadow-sm">
-                                <ClipboardCheck className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-900/20 shadow-sm">
+                                    <ClipboardCheck className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                                </div>
+                                <div>
+                                    <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                                        Audit Logs
+                                    </h1>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                                        Track system activity and user actions
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                                    Audit Logs
-                                </h1>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">
-                                    Track system activity and user actions
-                                </p>
-                            </div>
+                            <button
+                                type="button"
+                                onClick={() => exportAuditLogsToCSV(logs)}
+                                disabled={logs.length === 0}
+                                className="inline-flex w-fit items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                            >
+                                <Download className="h-4 w-4" />
+                                Export Logs
+                            </button>
                         </div>
                     </div>
 

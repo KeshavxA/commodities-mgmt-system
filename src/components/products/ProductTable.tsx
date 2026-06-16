@@ -13,11 +13,13 @@ import {
     Trash2,
     ChevronDown,
     ChevronRight,
+    Download,
 } from "lucide-react";
 import clsx from "clsx";
 import { useAuth } from "@/src/context/AuthContext";
 import { useLanguage } from "@/src/context/LanguageContext";
 import { getCategories, type Product } from "@/src/data/sampleProducts";
+import { exportProductsToCSV } from "@/src/utils/exportUtils";
 import ProductModal from "./ProductModal";
 
 type SortKey = keyof Pick<Product, "name" | "category" | "price" | "stock">;
@@ -222,29 +224,49 @@ export default function ProductTable({
                         </button>
 
                         {isManager && (
-                            <button
-                                type="button"
-                                id="add-product-btn-mobile"
-                                onClick={handleAdd}
-                                className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all hover:shadow-lg hover:shadow-indigo-500/30 active:scale-[0.98] sm:hidden"
-                            >
-                                <Plus className="h-4 w-4" />
-                                Add
-                            </button>
+                            <div className="flex items-center gap-2 sm:hidden">
+                                <button
+                                    type="button"
+                                    onClick={() => exportProductsToCSV(filtered)}
+                                    className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white p-2 text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                                    title="Export to CSV"
+                                >
+                                    <Download className="h-4 w-4" />
+                                </button>
+                                <button
+                                    type="button"
+                                    id="add-product-btn-mobile"
+                                    onClick={handleAdd}
+                                    className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all hover:shadow-lg hover:shadow-indigo-500/30 active:scale-[0.98]"
+                                >
+                                    <Plus className="h-4 w-4" />
+                                    Add
+                                </button>
+                            </div>
                         )}
                     </div>
                 </div>
 
                 {isManager && (
-                    <button
-                        type="button"
-                        id="add-product-btn"
-                        onClick={handleAdd}
-                        className="hidden items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all hover:shadow-lg hover:shadow-indigo-500/30 active:scale-[0.98] sm:inline-flex"
-                    >
-                        <Plus className="h-4 w-4" />
-                        Add Product
-                    </button>
+                    <div className="hidden sm:flex items-center gap-3">
+                        <button
+                            type="button"
+                            onClick={() => exportProductsToCSV(filtered)}
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                        >
+                            <Download className="h-4 w-4" />
+                            Export CSV
+                        </button>
+                        <button
+                            type="button"
+                            id="add-product-btn"
+                            onClick={handleAdd}
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all hover:shadow-lg hover:shadow-indigo-500/30 active:scale-[0.98]"
+                        >
+                            <Plus className="h-4 w-4" />
+                            Add Product
+                        </button>
+                    </div>
                 )}
             </div>
 
