@@ -29,6 +29,7 @@ export default function ProductModal({
         category: categories[0],
         price: "",
         stock: "",
+        minThreshold: "50",
         unit: "",
         supplier: "",
     });
@@ -42,6 +43,7 @@ export default function ProductModal({
                 category: product.category,
                 price: String(product.price),
                 stock: String(product.stock),
+                minThreshold: String(product.minThreshold),
                 unit: product.unit,
                 supplier: product.supplier,
             });
@@ -51,6 +53,7 @@ export default function ProductModal({
                 category: categories[0],
                 price: "",
                 stock: "",
+                minThreshold: "50",
                 unit: "",
                 supplier: "",
             });
@@ -71,6 +74,13 @@ export default function ProductModal({
             !Number.isInteger(Number(form.stock))
         )
             errs.stock = "Enter a valid whole number";
+        if (
+            !form.minThreshold ||
+            isNaN(Number(form.minThreshold)) ||
+            Number(form.minThreshold) < 0 ||
+            !Number.isInteger(Number(form.minThreshold))
+        )
+            errs.minThreshold = "Enter a valid threshold";
         if (!form.unit.trim()) errs.unit = "Unit is required";
         if (!form.supplier.trim()) errs.supplier = "Supplier is required";
         setErrors(errs);
@@ -89,6 +99,7 @@ export default function ProductModal({
             category: form.category,
             price: parseFloat(Number(form.price).toFixed(2)),
             stock: parseInt(form.stock, 10),
+            minThreshold: parseInt(form.minThreshold, 10),
             unit: form.unit.trim(),
             supplier: form.supplier.trim(),
             lastUpdated: today,
@@ -189,6 +200,16 @@ export default function ProductModal({
 
                     <div className="grid grid-cols-2 gap-4">
                         <Field
+                            id="product-min-threshold"
+                            label="Min Threshold"
+                            value={form.minThreshold}
+                            error={errors.minThreshold}
+                            onChange={(v) => setForm((f) => ({ ...f, minThreshold: v }))}
+                            placeholder="50"
+                            type="number"
+                            step="1"
+                        />
+                        <Field
                             id="product-unit"
                             label="Unit"
                             value={form.unit}
@@ -196,6 +217,8 @@ export default function ProductModal({
                             onChange={(v) => setForm((f) => ({ ...f, unit: v }))}
                             placeholder="barrels"
                         />
+                    </div>
+                    <div>
                         <Field
                             id="product-supplier"
                             label="Supplier"

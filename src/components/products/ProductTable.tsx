@@ -17,7 +17,7 @@ import {
 import clsx from "clsx";
 import { useAuth } from "@/src/context/AuthContext";
 import { useLanguage } from "@/src/context/LanguageContext";
-import { LOW_STOCK_THRESHOLD, getCategories, type Product } from "@/src/data/sampleProducts";
+import { getCategories, type Product } from "@/src/data/sampleProducts";
 import ProductModal from "./ProductModal";
 
 type SortKey = keyof Pick<Product, "name" | "category" | "price" | "stock">;
@@ -322,7 +322,7 @@ export default function ProductTable({
 
                                             {isOpen &&
                                                 items.map((p) => {
-                                                    const isLow = p.stock < LOW_STOCK_THRESHOLD;
+                                                    const isLow = p.stock <= p.minThreshold;
                                                     const isDeleting = deletingId === p.id;
 
                                                     return (
@@ -429,7 +429,7 @@ export default function ProductTable({
                                 })
                             ) : (
                                 filtered.map((p) => {
-                                    const isLow = p.stock < LOW_STOCK_THRESHOLD;
+                                    const isLow = p.stock <= p.minThreshold;
                                     const isDeleting = deletingId === p.id;
 
                                     return (

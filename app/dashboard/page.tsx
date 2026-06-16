@@ -108,8 +108,7 @@ function DashboardContent() {
                                     <p className="mt-0.5 text-sm text-red-600 dark:text-red-400">
                                         {lowStockItems.map((p) => p.name).join(", ")} —{" "}
                                         {lowStockItems.length} item
-                                        {lowStockItems.length > 1 ? "s" : ""} below the threshold of
-                                        50 units.
+                                        {lowStockItems.length > 1 ? "s" : ""} below their individual minimum thresholds.
                                     </p>
                                 </div>
                             </div>

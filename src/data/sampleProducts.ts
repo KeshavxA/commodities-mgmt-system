@@ -7,9 +7,8 @@ export interface Product {
     unit: string;
     supplier: string;
     lastUpdated: string;
+    minThreshold: number;
 }
-
-export const LOW_STOCK_THRESHOLD = 50;
 
 export const sampleProducts: Product[] = [
     {
@@ -21,6 +20,7 @@ export const sampleProducts: Product[] = [
         unit: "barrels",
         supplier: "PetroGlobal Inc.",
         lastUpdated: "2026-03-05",
+        minThreshold: 50,
     },
     {
         id: "COM-002",
@@ -31,6 +31,7 @@ export const sampleProducts: Product[] = [
         unit: "MMBtu",
         supplier: "GasLink Corp.",
         lastUpdated: "2026-03-04",
+        minThreshold: 50,
     },
     {
         id: "COM-003",
@@ -41,6 +42,7 @@ export const sampleProducts: Product[] = [
         unit: "troy oz",
         supplier: "AurumVault Ltd.",
         lastUpdated: "2026-03-06",
+        minThreshold: 50,
     },
     {
         id: "COM-004",
@@ -51,6 +53,7 @@ export const sampleProducts: Product[] = [
         unit: "troy oz",
         supplier: "SilverEdge Mining",
         lastUpdated: "2026-03-05",
+        minThreshold: 50,
     },
     {
         id: "COM-005",
@@ -61,6 +64,7 @@ export const sampleProducts: Product[] = [
         unit: "metric tons",
         supplier: "CopperWire Intl.",
         lastUpdated: "2026-03-03",
+        minThreshold: 50,
     },
     {
         id: "COM-006",
@@ -71,6 +75,7 @@ export const sampleProducts: Product[] = [
         unit: "bushels (×1000)",
         supplier: "GrainHarvest Co.",
         lastUpdated: "2026-03-06",
+        minThreshold: 50,
     },
     {
         id: "COM-007",
@@ -81,6 +86,7 @@ export const sampleProducts: Product[] = [
         unit: "bushels",
         supplier: "MidWest Agri",
         lastUpdated: "2026-03-05",
+        minThreshold: 50,
     },
     {
         id: "COM-008",
@@ -91,6 +97,7 @@ export const sampleProducts: Product[] = [
         unit: "bushels",
         supplier: "SoyPrime Farms",
         lastUpdated: "2026-03-04",
+        minThreshold: 50,
     },
     {
         id: "COM-009",
@@ -101,6 +108,7 @@ export const sampleProducts: Product[] = [
         unit: "lbs (×1000)",
         supplier: "TextileSouth LLC",
         lastUpdated: "2026-03-02",
+        minThreshold: 50,
     },
     {
         id: "COM-010",
@@ -111,6 +119,7 @@ export const sampleProducts: Product[] = [
         unit: "lbs",
         supplier: "BeanOrigin Trade",
         lastUpdated: "2026-03-06",
+        minThreshold: 50,
     },
     {
         id: "COM-011",
@@ -121,6 +130,7 @@ export const sampleProducts: Product[] = [
         unit: "lbs (×1000)",
         supplier: "SweetCane Global",
         lastUpdated: "2026-03-05",
+        minThreshold: 50,
     },
     {
         id: "COM-012",
@@ -131,6 +141,7 @@ export const sampleProducts: Product[] = [
         unit: "troy oz",
         supplier: "NobleMetal Corp.",
         lastUpdated: "2026-03-04",
+        minThreshold: 50,
     },
     {
         id: "COM-013",
@@ -141,6 +152,7 @@ export const sampleProducts: Product[] = [
         unit: "troy oz",
         supplier: "NobleMetal Corp.",
         lastUpdated: "2026-03-03",
+        minThreshold: 50,
     },
     {
         id: "COM-014",
@@ -151,6 +163,7 @@ export const sampleProducts: Product[] = [
         unit: "board ft",
         supplier: "TimberNorth Inc.",
         lastUpdated: "2026-03-06",
+        minThreshold: 50,
     },
     {
         id: "COM-015",
@@ -161,6 +174,7 @@ export const sampleProducts: Product[] = [
         unit: "metric tons",
         supplier: "SteelSource Mining",
         lastUpdated: "2026-03-05",
+        minThreshold: 50,
     },
     {
         id: "COM-016",
@@ -171,6 +185,7 @@ export const sampleProducts: Product[] = [
         unit: "metric tons",
         supplier: "BatteryMineral Co.",
         lastUpdated: "2026-03-06",
+        minThreshold: 50,
     },
     {
         id: "COM-017",
@@ -181,6 +196,7 @@ export const sampleProducts: Product[] = [
         unit: "metric tons",
         supplier: "WestAfrican Cocoa",
         lastUpdated: "2026-03-04",
+        minThreshold: 50,
     },
     {
         id: "COM-018",
@@ -191,6 +207,7 @@ export const sampleProducts: Product[] = [
         unit: "cwt",
         supplier: "AsiaGrain Exports",
         lastUpdated: "2026-03-05",
+        minThreshold: 50,
     },
     {
         id: "COM-019",
@@ -201,6 +218,7 @@ export const sampleProducts: Product[] = [
         unit: "metric tons",
         supplier: "LightAlloy Smelters",
         lastUpdated: "2026-03-03",
+        minThreshold: 50,
     },
     {
         id: "COM-020",
@@ -211,6 +229,7 @@ export const sampleProducts: Product[] = [
         unit: "metric tons",
         supplier: "NickelPure Refinery",
         lastUpdated: "2026-03-06",
+        minThreshold: 50,
     },
 ];
 
@@ -219,7 +238,7 @@ export function getTotalProducts(): number {
 }
 
 export function getLowStockProducts(): Product[] {
-    return sampleProducts.filter((p) => p.stock < LOW_STOCK_THRESHOLD);
+    return sampleProducts.filter((p) => p.stock <= p.minThreshold);
 }
 
 export function getTotalValue(): number {
