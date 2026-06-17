@@ -111,7 +111,7 @@ function RolesContent() {
                         <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
                             <div className="mb-6 flex items-center justify-between border-b border-gray-100 pb-4 dark:border-gray-800">
                                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                    {isCreating ? "Create New Role" : `Edit Role: ${editingRole.name}`}
+                                    {isCreating ? "Create New Role" : `Edit Role: ${editingRole?.name}`}
                                 </h2>
                                 <button onClick={handleCancel} className="text-gray-400 hover:text-gray-600">
                                     <X className="h-5 w-5" />
@@ -196,7 +196,9 @@ function RolesContent() {
                                             <h3 className="flex items-center gap-2 text-lg font-bold text-gray-900 dark:text-white">
                                                 {role.name}
                                                 {role.isSystem && (
-                                                    <Lock className="h-3.5 w-3.5 text-gray-400" title="System Role" />
+                                                    <span title="System Role">
+                                                        <Lock className="h-3.5 w-3.5 text-gray-400" />
+                                                    </span>
                                                 )}
                                             </h3>
                                             <p className="text-xs text-gray-500 dark:text-gray-400">
