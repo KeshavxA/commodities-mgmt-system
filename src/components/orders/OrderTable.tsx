@@ -1,3 +1,5 @@
+"use client";
+
 import { Check, X, Clock, FileText } from "lucide-react";
 import clsx from "clsx";
 import { useAuth } from "@/src/context/AuthContext";
