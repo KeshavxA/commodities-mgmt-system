@@ -25,7 +25,6 @@ import { getCategories, type Product } from "@/src/data/sampleProducts";
 import { exportProductsToCSV } from "@/src/utils/exportUtils";
 import ProductModal from "./ProductModal";
 import ScannerModal from "../scanner/ScannerModal";
-import { MapPin } from "lucide-react";
 
 type SortKey = keyof Pick<Product, "name" | "category" | "price" | "stock">;
 type SortDir = "asc" | "desc";
@@ -446,7 +445,7 @@ export default function ProductTable({
                                                                         )}
                                                                     >
                                                                         {isLow && (
-                                                                            <AlertTriangle className="h-3.5 w-3.5" title="Low Stock" />
+                                                                            <span title="Low Stock"><AlertTriangle className="h-3.5 w-3.5" /></span>
                                                                         )}
                                                                         {p.stock.toLocaleString()} {p.unit}
                                                                     </span>
@@ -569,7 +568,7 @@ export default function ProductTable({
                                                                 : "text-gray-700 dark:text-gray-300"
                                                         )}
                                                     >
-                                                        {isLow && <AlertTriangle className="h-3.5 w-3.5" title="Low Stock" />}
+                                                        {isLow && <span title="Low Stock"><AlertTriangle className="h-3.5 w-3.5" /></span>}
                                                         {p.stock.toLocaleString()} {p.unit}
                                                     </span>
                                                     {expiringBatch && (

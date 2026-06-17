@@ -419,6 +419,7 @@ function Field({
     placeholder,
     type = "text",
     step,
+    disabled,
 }: {
     id: string;
     label: string;

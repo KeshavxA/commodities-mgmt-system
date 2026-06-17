@@ -10,6 +10,7 @@ import { useAudit } from "@/src/context/AuditContext";
 import { type Supplier, sampleSuppliers } from "@/src/data/sampleSuppliers";
 import { sampleProducts } from "@/src/data/sampleProducts";
 import { Building2 } from "lucide-react";
+import { useAuth } from "@/src/context/AuthContext";
 
 export default function SuppliersPage() {
     const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -18,6 +19,7 @@ export default function SuppliersPage() {
     const [viewingSupplier, setViewingSupplier] = useState<Supplier | null>(null);
 
     const { logAction } = useAudit();
+    const { user } = useAuth();
 
     // Load mock data on mount
     useEffect(() => {
@@ -29,10 +31,10 @@ export default function SuppliersPage() {
 
         if (isEditing) {
             setSuppliers((prev) => prev.map((s) => (s.id === supplier.id ? supplier : s)));
-            logAction("UPDATE", `Updated supplier: ${supplier.name} (${supplier.id})`);
+            if (user) logAction("UPDATE", `Updated supplier: ${supplier.name} (${supplier.id})`, user);
         } else {
             setSuppliers((prev) => [supplier, ...prev]);
-            logAction("CREATE", `Added new supplier: ${supplier.name} (${supplier.id})`);
+            if (user) logAction("CREATE", `Added new supplier: ${supplier.name} (${supplier.id})`, user);
         }
     }
 
@@ -40,7 +42,7 @@ export default function SuppliersPage() {
         const toDelete = suppliers.find((s) => s.id === id);
         if (toDelete) {
             setSuppliers((prev) => prev.filter((s) => s.id !== id));
-            logAction("DELETE", `Deleted supplier: ${toDelete.name} (${toDelete.id})`);
+            if (user) logAction("DELETE", `Deleted supplier: ${toDelete.name} (${toDelete.id})`, user);
         }
     }
 
