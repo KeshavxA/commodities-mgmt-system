@@ -17,6 +17,7 @@ import {
     X,
     Shield,
     Warehouse,
+    Truck,
 } from "lucide-react";
 import clsx from "clsx";
 import { useState, useEffect } from "react";
@@ -49,6 +50,13 @@ const navigation = [
         href: "/audit-logs",
         icon: ClipboardCheck,
         managerOnly: true,
+    },
+    {
+        key: "suppliers",
+        name: "Suppliers",
+        href: "/suppliers",
+        icon: Truck,
+        managerOnly: false,
     },
     {
         key: "settings",

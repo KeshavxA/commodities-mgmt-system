@@ -39,6 +39,7 @@ const translations = {
     groupByCategory: "Group by category",
     results: "results",
     auditLogs: "Audit Logs",
+    suppliers: "Suppliers",
   },
   de: {
     home: "Startseite",
@@ -53,6 +54,7 @@ const translations = {
     groupByCategory: "Nach Kategorie gruppieren",
     results: "Ergebnisse",
     auditLogs: "Audit-Protokolle",
+    suppliers: "Lieferanten",
   },
   fr: {
     home: "Accueil",
@@ -67,6 +69,7 @@ const translations = {
     groupByCategory: "Grouper par catégorie",
     results: "résultats",
     auditLogs: "Journaux d'audit",
+    suppliers: "Fournisseurs",
   },
 } as const;
 
