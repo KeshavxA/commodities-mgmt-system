@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/src/context/AuthContext";
+import { useRBAC, type Permission } from "@/src/context/RBACContext";
 import { useLanguage } from "@/src/context/LanguageContext";
 import {
     Package,
@@ -22,53 +23,68 @@ import {
 import clsx from "clsx";
 import { useState, useEffect } from "react";
 
-const navigation = [
+interface NavItem {
+    key: string;
+    name: string;
+    href: string;
+    icon: any;
+    requiredPermissions?: Permission[];
+}
+
+const navigation: NavItem[] = [
     {
         key: "dashboard",
         name: "Dashboard",
         href: "/dashboard",
         icon: LayoutDashboard,
-        managerOnly: true,
+        requiredPermissions: ["dashboard:view"],
     },
     {
         key: "commodities",
         name: "Commodities",
         href: "/commodities",
         icon: Boxes,
-        managerOnly: false,
+        requiredPermissions: ["products:read"],
     },
     {
         key: "orders",
         name: "Orders",
         href: "/orders",
         icon: ClipboardList,
-        managerOnly: false,
+        requiredPermissions: ["orders:read"],
     },
     {
         key: "auditLogs",
         name: "Audit Logs",
         href: "/audit-logs",
         icon: ClipboardCheck,
-        managerOnly: true,
+        requiredPermissions: ["audit:view"],
     },
     {
         key: "suppliers",
         name: "Suppliers",
         href: "/suppliers",
         icon: Truck,
-        managerOnly: false,
+        requiredPermissions: ["suppliers:read"],
+    },
+    {
+        key: "roles",
+        name: "Roles & Permissions",
+        href: "/roles",
+        icon: Shield,
+        requiredPermissions: ["roles:manage"],
     },
     {
         key: "settings",
         name: "Settings",
         href: "/settings",
         icon: Settings,
-        managerOnly: false,
     },
 ];
 
 export default function Sidebar() {
     const { user, logout } = useAuth();
+    const { hasAnyPermission, getRoleName, hasPermission } = useRBAC();
     const { t } = useLanguage();
     const pathname = usePathname();
     const [collapsed, setCollapsed] = useState(false);
@@ -94,11 +110,11 @@ export default function Sidebar() {
     }, [mobileOpen]);
 
     const visibleLinks = navigation.filter(
-        (item) => !item.managerOnly || user?.role === "Manager"
+        (item) => !item.requiredPermissions || (user && hasAnyPermission(user.role, item.requiredPermissions))
     );
 
-    const isManager = user?.role === "Manager";
-    const RoleIcon = isManager ? Shield : Warehouse;
+    const isSystemAdmin = user && hasPermission(user.role, "roles:manage");
+    const RoleIcon = isSystemAdmin ? Shield : Warehouse;
 
     function SidebarContent() {
         return (
@@ -172,7 +188,7 @@ export default function Sidebar() {
                             <div
                                 className={clsx(
                                     "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white",
-                                    isManager
+                                    isSystemAdmin
                                         ? "bg-gradient-to-br from-violet-500 to-indigo-600"
                                         : "bg-gradient-to-br from-emerald-500 to-teal-600"
                                 )}
@@ -188,12 +204,12 @@ export default function Sidebar() {
                                     <span
                                         className={clsx(
                                             "text-[11px] font-medium",
-                                            isManager
+                                            isSystemAdmin
                                                 ? "text-violet-600 dark:text-violet-400"
                                                 : "text-emerald-600 dark:text-emerald-400"
                                         )}
                                     >
-                                        {user.role}
+                                        {getRoleName(user.role)}
                                     </span>
                                 </div>
                             </div>
@@ -205,11 +221,11 @@ export default function Sidebar() {
                             <div
                                 className={clsx(
                                     "flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold text-white",
-                                    isManager
+                                    isSystemAdmin
                                         ? "bg-gradient-to-br from-violet-500 to-indigo-600"
                                         : "bg-gradient-to-br from-emerald-500 to-teal-600"
                                 )}
-                                title={`${user.email} (${user.role})`}
+                                title={`${user.email} (${getRoleName(user.role)})`}
                             >
                                 {user.email[0].toUpperCase()}
                             </div>

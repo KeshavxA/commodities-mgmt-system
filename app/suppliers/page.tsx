@@ -12,7 +12,17 @@ import { sampleProducts } from "@/src/data/sampleProducts";
 import { Building2 } from "lucide-react";
 import { useAuth } from "@/src/context/AuthContext";
 
+import PermissionGuard from "@/src/components/auth/PermissionGuard";
+
 export default function SuppliersPage() {
+    return (
+        <PermissionGuard requiredPermissions={["suppliers:read"]}>
+            <SuppliersContent />
+        </PermissionGuard>
+    );
+}
+
+function SuppliersContent() {
     const [suppliers, setSuppliers] = useState<Supplier[]>([]);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);

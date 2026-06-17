@@ -1,6 +1,6 @@
 "use client";
 
-import RoleGuard from "@/src/components/auth/RoleGuard";
+import PermissionGuard from "@/src/components/auth/PermissionGuard";
 import Navbar from "@/src/components/layout/Navbar";
 import Sidebar from "@/src/components/layout/Sidebar";
 import { useAudit } from "@/src/context/AuditContext";
@@ -10,9 +10,9 @@ import { exportAuditLogsToCSV } from "@/src/utils/exportUtils";
 
 export default function AuditLogsPage() {
     return (
-        <RoleGuard allowedRoles={["Manager"]}>
+        <PermissionGuard requiredPermissions={["audit:view"]}>
             <AuditLogsContent />
-        </RoleGuard>
+        </PermissionGuard>
     );
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import RoleGuard from "@/src/components/auth/RoleGuard";
+import PermissionGuard from "@/src/components/auth/PermissionGuard";
 import { useAuth } from "@/src/context/AuthContext";
 import Navbar from "@/src/components/layout/Navbar";
 import Sidebar from "@/src/components/layout/Sidebar";
@@ -41,9 +41,9 @@ import {
 
 export default function DashboardPage() {
     return (
-        <RoleGuard allowedRoles={["Manager"]}>
+        <PermissionGuard requiredPermissions={["dashboard:view"]}>
             <DashboardContent />
-        </RoleGuard>
+        </PermissionGuard>
     );
 }
 

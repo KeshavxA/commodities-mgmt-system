@@ -11,11 +11,11 @@ import {
 import { useRouter } from "next/navigation";
 
 
-export type UserRole = "Manager" | "StoreKeeper";
+export type UserRole = string;
 
 export interface User {
     email: string;
-    role: UserRole;
+    role: UserRole; // This now maps to a role id in RBACContext (e.g. "role_manager")
 }
 
 interface AuthContextType {
@@ -26,10 +26,10 @@ interface AuthContextType {
 }
 
 const MOCK_USERS: Record<string, { password: string; role: UserRole }> = {
-    "manager@commodities.com": { password: "manager123", role: "Manager" },
+    "manager@commodities.com": { password: "manager123", role: "role_manager" },
     "storekeeper@commodities.com": {
         password: "keeper123",
-        role: "StoreKeeper",
+        role: "role_storekeeper",
     },
 };
 

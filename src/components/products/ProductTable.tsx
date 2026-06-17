@@ -22,6 +22,7 @@ import {
 import clsx from "clsx";
 import { useAuth } from "@/src/context/AuthContext";
 import { useLanguage } from "@/src/context/LanguageContext";
+import { useRBAC } from "@/src/context/RBACContext";
 import { getCategories, type Product } from "@/src/data/sampleProducts";
 import { exportProductsToCSV } from "@/src/utils/exportUtils";
 import ProductModal from "./ProductModal";
@@ -45,8 +46,13 @@ export default function ProductTable({
     onDeleteProduct,
 }: ProductTableProps) {
     const { user } = useAuth();
+    const { hasPermission } = useRBAC();
     const { t, translateCategory, translateProductName } = useLanguage();
-    const isManager = user?.role === "Manager";
+    
+    const canCreate = user ? hasPermission(user.role, "products:create") : false;
+    const canEdit = user ? hasPermission(user.role, "products:edit") : false;
+    const canDelete = user ? hasPermission(user.role, "products:delete") : false;
+    const canRequestRestock = user ? hasPermission(user.role, "orders:create") : false;
 
     const [search, setSearch] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("All");
@@ -262,7 +268,7 @@ export default function ProductTable({
                             </span>
                         </button>
 
-                        {isManager && (
+                        {canCreate && (
                             <div className="flex items-center gap-2 sm:hidden">
                                 <button
                                     type="button"
@@ -294,7 +300,7 @@ export default function ProductTable({
                     </div>
                 </div>
 
-                {isManager && (
+                {canCreate && (
                     <div className="hidden sm:flex items-center gap-3">
                         <button
                             type="button"
@@ -616,16 +622,18 @@ export default function ProductTable({
                                                     </div>
                                                 ) : (
                                                     <div className="flex items-center gap-1">
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleEdit(p)}
-                                                            className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/20 dark:hover:text-indigo-400"
-                                                            title="Edit product"
-                                                        >
-                                                            <Pencil className="h-4 w-4" />
-                                                        </button>
+                                                        {canEdit && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleEdit(p)}
+                                                                className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/20 dark:hover:text-indigo-400"
+                                                                title="Edit product"
+                                                            >
+                                                                <Pencil className="h-4 w-4" />
+                                                            </button>
+                                                        )}
 
-                                                        {isManager && (
+                                                        {canDelete && (
                                                             <button
                                                                 type="button"
                                                                 onClick={() => setDeletingId(p.id)}
@@ -636,7 +644,7 @@ export default function ProductTable({
                                                             </button>
                                                         )}
                                                         
-                                                        {!isManager && (
+                                                        {canRequestRestock && (
                                                             <button
                                                                 type="button"
                                                                 onClick={() => setRestockingProduct(p)}

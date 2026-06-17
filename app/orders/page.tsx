@@ -5,15 +5,15 @@ import Sidebar from "@/src/components/layout/Sidebar";
 import OrderTable from "@/src/components/orders/OrderTable";
 import { useOrders } from "@/src/context/OrderContext";
 import { ClipboardList } from "lucide-react";
-import RoleGuard from "@/src/components/auth/RoleGuard";
+import PermissionGuard from "@/src/components/auth/PermissionGuard";
 
 export default function OrdersPage() {
     return (
         // Allow both Managers and Store Keepers.
         // Store Keepers see their own requests, Managers see all and can approve.
-        <RoleGuard allowedRoles={["Manager", "StoreKeeper"]}>
+        <PermissionGuard requiredPermissions={["orders:read"]}>
             <OrdersContent />
-        </RoleGuard>
+        </PermissionGuard>
     );
 }
 

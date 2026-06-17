@@ -10,7 +10,17 @@ import ProductTable from "@/src/components/products/ProductTable";
 import { sampleProducts, type Product } from "@/src/data/sampleProducts";
 import { Boxes } from "lucide-react";
 
+import PermissionGuard from "@/src/components/auth/PermissionGuard";
+
 export default function CommoditiesPage() {
+    return (
+        <PermissionGuard requiredPermissions={["products:read"]}>
+            <CommoditiesContent />
+        </PermissionGuard>
+    );
+}
+
+function CommoditiesContent() {
     const { user, isAuthenticated } = useAuth();
     const { logAction } = useAudit();
     const router = useRouter();
