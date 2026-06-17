@@ -17,6 +17,7 @@ import {
     ScanLine,
     MapPin,
     Clock,
+    RefreshCcw,
 } from "lucide-react";
 import clsx from "clsx";
 import { useAuth } from "@/src/context/AuthContext";
@@ -25,6 +26,7 @@ import { getCategories, type Product } from "@/src/data/sampleProducts";
 import { exportProductsToCSV } from "@/src/utils/exportUtils";
 import ProductModal from "./ProductModal";
 import ScannerModal from "../scanner/ScannerModal";
+import RestockModal from "./RestockModal";
 
 type SortKey = keyof Pick<Product, "name" | "category" | "price" | "stock">;
 type SortDir = "asc" | "desc";
@@ -54,6 +56,7 @@ export default function ProductTable({
     const [modalOpen, setModalOpen] = useState(false);
     const [scannerOpen, setScannerOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+    const [restockingProduct, setRestockingProduct] = useState<Product | null>(null);
 
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
@@ -632,6 +635,17 @@ export default function ProductTable({
                                                                 <Trash2 className="h-4 w-4" />
                                                             </button>
                                                         )}
+                                                        
+                                                        {!isManager && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setRestockingProduct(p)}
+                                                                className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-amber-50 hover:text-amber-500 dark:hover:bg-amber-900/20 dark:hover:text-amber-400"
+                                                                title="Request Restock"
+                                                            >
+                                                                <RefreshCcw className="h-4 w-4" />
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 )}
                                             </td>
@@ -658,6 +672,12 @@ export default function ProductTable({
                 isOpen={scannerOpen}
                 onClose={() => setScannerOpen(false)}
                 onScan={handleScan}
+            />
+
+            <RestockModal
+                isOpen={!!restockingProduct}
+                onClose={() => setRestockingProduct(null)}
+                product={restockingProduct}
             />
         </div>
     );
