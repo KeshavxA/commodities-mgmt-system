@@ -1,3 +1,9 @@
+export interface Batch {
+    batchNumber: string;
+    quantity: number;
+    expiryDate: string;
+}
+
 export interface Product {
     id: string;
     name: string;
@@ -13,6 +19,7 @@ export interface Product {
         aisle: string;
         bin: string;
     };
+    batches?: Batch[];
 }
 
 export const sampleProducts: Product[] = [
@@ -87,6 +94,10 @@ export const sampleProducts: Product[] = [
         lastUpdated: "2026-03-06",
         minThreshold: 50,
         location: { warehouse: "Silo North", aisle: "S-1", bin: "Bin 1" },
+        batches: [
+            { batchNumber: "B-2026-001", quantity: 50000, expiryDate: "2026-07-15" },
+            { batchNumber: "B-2026-002", quantity: 35000, expiryDate: "2026-12-01" },
+        ],
     },
     {
         id: "COM-007",
@@ -99,6 +110,10 @@ export const sampleProducts: Product[] = [
         lastUpdated: "2026-03-05",
         minThreshold: 50,
         location: { warehouse: "Silo North", aisle: "S-2", bin: "Bin 4" },
+        batches: [
+            { batchNumber: "SY-26-A", quantity: 40000, expiryDate: "2026-06-25" }, // Expires soon
+            { batchNumber: "SY-26-B", quantity: 25000, expiryDate: "2026-09-30" },
+        ],
     },
     {
         id: "COM-008",
@@ -123,6 +138,9 @@ export const sampleProducts: Product[] = [
         lastUpdated: "2026-03-02",
         minThreshold: 50,
         location: { warehouse: "Warehouse C", aisle: "C-1", bin: "Rack 5" },
+        batches: [
+            { batchNumber: "CT-A1", quantity: 15000, expiryDate: "2027-01-10" },
+        ],
     },
     {
         id: "COM-010",

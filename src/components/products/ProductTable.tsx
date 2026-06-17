@@ -15,6 +15,8 @@ import {
     ChevronRight,
     Download,
     ScanLine,
+    MapPin,
+    Clock,
 } from "lucide-react";
 import clsx from "clsx";
 import { useAuth } from "@/src/context/AuthContext";
@@ -161,6 +163,16 @@ export default function ProductTable({
         if (loc.bin) parts.push(`Bin ${loc.bin}`);
         const secondary = parts.length > 0 ? ` (${parts.join(", ")})` : "";
         return `${loc.warehouse || "Unknown"}${secondary}`;
+    }
+
+    function getExpiringBatch(p: Product) {
+        if (!p.batches || p.batches.length === 0) return null;
+        const now = new Date();
+        const thirtyDays = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+        
+        const sorted = [...p.batches].sort((a, b) => new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime());
+        const expiring = sorted.find(b => new Date(b.expiryDate) <= thirtyDays);
+        return expiring || null;
     }
 
     function SortIcon({ col }: { col: SortKey }) {
@@ -388,6 +400,7 @@ export default function ProductTable({
                                                 items.map((p) => {
                                                     const isLow = p.stock <= p.minThreshold;
                                                     const isDeleting = deletingId === p.id;
+                                                    const expiringBatch = getExpiringBatch(p);
 
                                                     return (
                                                         <tr
@@ -423,19 +436,29 @@ export default function ProductTable({
                                                                 })}
                                                             </td>
                                                             <td className="px-4 py-3">
-                                                                <span
-                                                                    className={clsx(
-                                                                        "inline-flex items-center gap-1 font-medium",
-                                                                        isLow
-                                                                            ? "text-red-600 dark:text-red-400"
-                                                                            : "text-gray-700 dark:text-gray-300"
+                                                                <div className="flex items-center gap-2">
+                                                                    <span
+                                                                        className={clsx(
+                                                                            "inline-flex items-center gap-1 font-medium",
+                                                                            isLow
+                                                                                ? "text-red-600 dark:text-red-400"
+                                                                                : "text-gray-700 dark:text-gray-300"
+                                                                        )}
+                                                                    >
+                                                                        {isLow && (
+                                                                            <AlertTriangle className="h-3.5 w-3.5" title="Low Stock" />
+                                                                        )}
+                                                                        {p.stock.toLocaleString()} {p.unit}
+                                                                    </span>
+                                                                    {expiringBatch && (
+                                                                        <div className="group relative flex items-center">
+                                                                            <Clock className="h-4 w-4 text-orange-500" />
+                                                                            <div className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs text-white shadow-lg group-hover:block dark:bg-gray-800">
+                                                                                Batch {expiringBatch.batchNumber} expires on {expiringBatch.expiryDate}
+                                                                            </div>
+                                                                        </div>
                                                                     )}
-                                                                >
-                                                                    {isLow && (
-                                                                        <AlertTriangle className="h-3.5 w-3.5" />
-                                                                    )}
-                                                                    {p.stock.toLocaleString()} {p.unit}
-                                                                </span>
+                                                                </div>
                                                             </td>
                                                             <td className="px-4 py-3 text-gray-500 dark:text-gray-400 hidden lg:table-cell">
                                                                 {p.supplier}
@@ -501,6 +524,7 @@ export default function ProductTable({
                                 filtered.map((p) => {
                                     const isLow = p.stock <= p.minThreshold;
                                     const isDeleting = deletingId === p.id;
+                                    const expiringBatch = getExpiringBatch(p);
 
                                     return (
                                         <tr
@@ -536,17 +560,27 @@ export default function ProductTable({
                                                 })}
                                             </td>
                                             <td className="px-4 py-3">
-                                                <span
-                                                    className={clsx(
-                                                        "inline-flex items-center gap-1 font-medium",
-                                                        isLow
-                                                            ? "text-red-600 dark:text-red-400"
-                                                            : "text-gray-700 dark:text-gray-300"
+                                                <div className="flex items-center gap-2">
+                                                    <span
+                                                        className={clsx(
+                                                            "inline-flex items-center gap-1 font-medium",
+                                                            isLow
+                                                                ? "text-red-600 dark:text-red-400"
+                                                                : "text-gray-700 dark:text-gray-300"
+                                                        )}
+                                                    >
+                                                        {isLow && <AlertTriangle className="h-3.5 w-3.5" title="Low Stock" />}
+                                                        {p.stock.toLocaleString()} {p.unit}
+                                                    </span>
+                                                    {expiringBatch && (
+                                                        <div className="group relative flex items-center">
+                                                            <Clock className="h-4 w-4 text-orange-500" />
+                                                            <div className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs text-white shadow-lg group-hover:block dark:bg-gray-800">
+                                                                Batch {expiringBatch.batchNumber} expires on {expiringBatch.expiryDate}
+                                                            </div>
+                                                        </div>
                                                     )}
-                                                >
-                                                    {isLow && <AlertTriangle className="h-3.5 w-3.5" />}
-                                                    {p.stock.toLocaleString()} {p.unit}
-                                                </span>
+                                                </div>
                                             </td>
                                             <td className="px-4 py-3 text-gray-500 dark:text-gray-400 hidden lg:table-cell">
                                                 {p.supplier}

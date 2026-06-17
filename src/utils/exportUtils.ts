@@ -35,6 +35,7 @@ export function exportProductsToCSV(products: Product[]) {
         "Total Value",
         "Supplier",
         "Location",
+        "Earliest Expiry",
         "Last Updated"
     ];
 
@@ -45,6 +46,12 @@ export function exportProductsToCSV(products: Product[]) {
         const locStr = loc && (loc.warehouse || loc.aisle || loc.bin)
             ? `${loc.warehouse || "Unknown"} (Aisle ${loc.aisle || "-"}, Bin ${loc.bin || "-"})`
             : "Unassigned";
+
+        let earliestExpiry = "-";
+        if (p.batches && p.batches.length > 0) {
+            const sorted = [...p.batches].sort((a, b) => new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime());
+            if (sorted.length > 0) earliestExpiry = sorted[0].expiryDate;
+        }
 
         return [
             p.id,
@@ -58,6 +65,7 @@ export function exportProductsToCSV(products: Product[]) {
             totalValue.toFixed(2),
             p.supplier,
             locStr,
+            earliestExpiry,
             p.lastUpdated
         ].map(escapeCSV).join(",");
     });

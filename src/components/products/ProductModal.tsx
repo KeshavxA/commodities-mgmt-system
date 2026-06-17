@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, type FormEvent } from "react";
-import { X } from "lucide-react";
+import { X, Plus, Trash2 } from "lucide-react";
 import clsx from "clsx";
-import { getCategories, type Product } from "@/src/data/sampleProducts";
+import { getCategories, type Product, type Batch } from "@/src/data/sampleProducts";
 import { useLanguage } from "@/src/context/LanguageContext";
 
 interface ProductModalProps {
@@ -35,9 +35,17 @@ export default function ProductModal({
         warehouse: "",
         aisle: "",
         bin: "",
+        batches: [] as Batch[],
     });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
+
+    useEffect(() => {
+        if (form.batches.length > 0) {
+            const totalStock = form.batches.reduce((sum, b) => sum + (Number(b.quantity) || 0), 0);
+            setForm((prev) => ({ ...prev, stock: String(totalStock) }));
+        }
+    }, [form.batches]);
 
     useEffect(() => {
         if (product) {
@@ -52,6 +60,7 @@ export default function ProductModal({
                 warehouse: product.location?.warehouse || "",
                 aisle: product.location?.aisle || "",
                 bin: product.location?.bin || "",
+                batches: product.batches ? [...product.batches] : [],
             });
         } else {
             setForm({
@@ -65,6 +74,7 @@ export default function ProductModal({
                 warehouse: "",
                 aisle: "",
                 bin: "",
+                batches: [],
             });
         }
         setErrors({});
@@ -92,6 +102,13 @@ export default function ProductModal({
             errs.minThreshold = "Enter a valid threshold";
         if (!form.unit.trim()) errs.unit = "Unit is required";
         if (!form.supplier.trim()) errs.supplier = "Supplier is required";
+        
+        form.batches.forEach((b, i) => {
+            if (!b.batchNumber.trim()) errs[`batch_${i}_num`] = "Required";
+            if (!b.expiryDate) errs[`batch_${i}_exp`] = "Required";
+            if (Number(b.quantity) <= 0) errs[`batch_${i}_qty`] = "Invalid";
+        });
+
         setErrors(errs);
         return Object.keys(errs).length === 0;
     }
@@ -119,6 +136,7 @@ export default function ProductModal({
                           bin: form.bin.trim(),
                       }
                     : undefined,
+            batches: form.batches.length > 0 ? form.batches : undefined,
             lastUpdated: today,
         };
 
@@ -205,13 +223,14 @@ export default function ProductModal({
                         />
                         <Field
                             id="product-stock"
-                            label="Stock"
+                            label={form.batches.length > 0 ? "Stock (Auto-computed)" : "Stock"}
                             value={form.stock}
                             error={errors.stock}
                             onChange={(v) => setForm((f) => ({ ...f, stock: v }))}
                             placeholder="12000"
                             type="number"
                             step="1"
+                            disabled={form.batches.length > 0}
                         />
                     </div>
 
@@ -275,6 +294,99 @@ export default function ProductModal({
                         </div>
                     </div>
 
+                    <div className="pt-2">
+                        <div className="mb-3 flex items-center justify-between">
+                            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                                Batches & FIFO (Optional)
+                            </h3>
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setForm((f) => ({
+                                        ...f,
+                                        batches: [
+                                            ...f.batches,
+                                            { batchNumber: "", quantity: 0, expiryDate: "" },
+                                        ],
+                                    }))
+                                }
+                                className="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+                            >
+                                <Plus className="h-3.5 w-3.5" />
+                                Add Batch
+                            </button>
+                        </div>
+                        
+                        {form.batches.length > 0 && (
+                            <div className="space-y-3 rounded-xl border border-gray-100 bg-gray-50/50 p-3 dark:border-gray-800 dark:bg-gray-800/30">
+                                {form.batches.map((batch, index) => (
+                                    <div key={index} className="flex items-start gap-2">
+                                        <div className="flex-1 space-y-1">
+                                            <input
+                                                type="text"
+                                                placeholder="Batch #"
+                                                value={batch.batchNumber}
+                                                onChange={(e) => {
+                                                    const newBatches = [...form.batches];
+                                                    newBatches[index].batchNumber = e.target.value;
+                                                    setForm({ ...form, batches: newBatches });
+                                                }}
+                                                className={clsx(
+                                                    "w-full rounded-lg border px-2.5 py-1.5 text-xs outline-none transition-all dark:bg-gray-900 dark:text-white",
+                                                    errors[`batch_${index}_num`] ? "border-red-300 focus:border-red-400" : "border-gray-200 focus:border-indigo-400 dark:border-gray-700"
+                                                )}
+                                            />
+                                            {errors[`batch_${index}_num`] && <p className="text-[10px] text-red-500">{errors[`batch_${index}_num`]}</p>}
+                                        </div>
+                                        <div className="flex-1 space-y-1">
+                                            <input
+                                                type="number"
+                                                placeholder="Qty"
+                                                value={batch.quantity || ""}
+                                                onChange={(e) => {
+                                                    const newBatches = [...form.batches];
+                                                    newBatches[index].quantity = parseInt(e.target.value, 10) || 0;
+                                                    setForm({ ...form, batches: newBatches });
+                                                }}
+                                                className={clsx(
+                                                    "w-full rounded-lg border px-2.5 py-1.5 text-xs outline-none transition-all dark:bg-gray-900 dark:text-white",
+                                                    errors[`batch_${index}_qty`] ? "border-red-300 focus:border-red-400" : "border-gray-200 focus:border-indigo-400 dark:border-gray-700"
+                                                )}
+                                            />
+                                            {errors[`batch_${index}_qty`] && <p className="text-[10px] text-red-500">{errors[`batch_${index}_qty`]}</p>}
+                                        </div>
+                                        <div className="flex-1 space-y-1">
+                                            <input
+                                                type="date"
+                                                value={batch.expiryDate}
+                                                onChange={(e) => {
+                                                    const newBatches = [...form.batches];
+                                                    newBatches[index].expiryDate = e.target.value;
+                                                    setForm({ ...form, batches: newBatches });
+                                                }}
+                                                className={clsx(
+                                                    "w-full rounded-lg border px-2.5 py-1.5 text-xs outline-none transition-all dark:bg-gray-900 dark:text-white",
+                                                    errors[`batch_${index}_exp`] ? "border-red-300 focus:border-red-400" : "border-gray-200 focus:border-indigo-400 dark:border-gray-700"
+                                                )}
+                                            />
+                                            {errors[`batch_${index}_exp`] && <p className="text-[10px] text-red-500">{errors[`batch_${index}_exp`]}</p>}
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const newBatches = form.batches.filter((_, i) => i !== index);
+                                                setForm({ ...form, batches: newBatches });
+                                            }}
+                                            className="mt-1 rounded-md p-1 text-gray-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
                     <div className="flex items-center justify-end gap-3 pt-2">
                         <button
                             type="button"
@@ -316,6 +428,7 @@ function Field({
     placeholder?: string;
     type?: string;
     step?: string;
+    disabled?: boolean;
 }) {
     return (
         <div>
@@ -332,10 +445,12 @@ function Field({
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
+                disabled={disabled}
                 className={clsx(
                     "w-full rounded-xl border px-3 py-2 text-sm outline-none transition-all",
                     "bg-white dark:bg-gray-800/50",
                     "text-gray-900 dark:text-gray-100",
+                    disabled && "opacity-60 cursor-not-allowed bg-gray-50 dark:bg-gray-800",
                     error
                         ? "border-red-300 focus:border-red-400 focus:ring-2 focus:ring-red-200 dark:border-red-700"
                         : "border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/40",
