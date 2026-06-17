@@ -14,6 +14,7 @@ import {
     ChevronDown,
     ChevronRight,
     Download,
+    ScanLine,
 } from "lucide-react";
 import clsx from "clsx";
 import { useAuth } from "@/src/context/AuthContext";
@@ -21,6 +22,7 @@ import { useLanguage } from "@/src/context/LanguageContext";
 import { getCategories, type Product } from "@/src/data/sampleProducts";
 import { exportProductsToCSV } from "@/src/utils/exportUtils";
 import ProductModal from "./ProductModal";
+import ScannerModal from "../scanner/ScannerModal";
 
 type SortKey = keyof Pick<Product, "name" | "category" | "price" | "stock">;
 type SortDir = "asc" | "desc";
@@ -48,6 +50,7 @@ export default function ProductTable({
     const [sortKey, setSortKey] = useState<SortKey>("name");
     const [sortDir, setSortDir] = useState<SortDir>("asc");
     const [modalOpen, setModalOpen] = useState(false);
+    const [scannerOpen, setScannerOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
     const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -136,6 +139,15 @@ export default function ProductTable({
     function handleDeleteConfirm(id: string) {
         onDeleteProduct(id);
         setDeletingId(null);
+    }
+
+    function handleScan(decodedText: string) {
+        const product = products.find((p) => p.id === decodedText);
+        if (product) {
+            handleEdit(product);
+        } else {
+            alert(`Product with ID "${decodedText}" not found in inventory.`);
+        }
     }
 
     function SortIcon({ col }: { col: SortKey }) {
@@ -227,6 +239,14 @@ export default function ProductTable({
                             <div className="flex items-center gap-2 sm:hidden">
                                 <button
                                     type="button"
+                                    onClick={() => setScannerOpen(true)}
+                                    className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white p-2 text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                                    title="Scan Barcode"
+                                >
+                                    <ScanLine className="h-4 w-4" />
+                                </button>
+                                <button
+                                    type="button"
                                     onClick={() => exportProductsToCSV(filtered)}
                                     className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white p-2 text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
                                     title="Export to CSV"
@@ -249,6 +269,14 @@ export default function ProductTable({
 
                 {isManager && (
                     <div className="hidden sm:flex items-center gap-3">
+                        <button
+                            type="button"
+                            onClick={() => setScannerOpen(true)}
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                        >
+                            <ScanLine className="h-4 w-4" />
+                            Scan Barcode
+                        </button>
                         <button
                             type="button"
                             onClick={() => exportProductsToCSV(filtered)}
@@ -565,6 +593,12 @@ export default function ProductTable({
                 }}
                 onSave={handleSave}
                 product={editingProduct}
+            />
+
+            <ScannerModal
+                isOpen={scannerOpen}
+                onClose={() => setScannerOpen(false)}
+                onScan={handleScan}
             />
         </div>
     );
