@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { useAuth } from "@/src/context/AuthContext";
 import { useOrders, type PurchaseOrder } from "@/src/context/OrderContext";
 import { useRBAC } from "@/src/context/RBACContext";
-import { formatDistanceToNow } from "@/src/utils/dateUtils";
+import { formatDistanceToNow } from "../../utils/dateUtils";
 
 interface OrderTableProps {
     orders: PurchaseOrder[];
