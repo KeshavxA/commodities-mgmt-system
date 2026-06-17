@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import RoleGuard from "@/src/components/auth/RoleGuard";
 import { useAuth } from "@/src/context/AuthContext";
 import Navbar from "@/src/components/layout/Navbar";
@@ -18,8 +19,25 @@ import {
     AlertTriangle,
     Layers,
     BarChart3,
+    PieChart as PieChartIcon,
+    TrendingUp as TrendingIcon,
 } from "lucide-react";
 import clsx from "clsx";
+import {
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+    PieChart,
+    Pie,
+    Cell,
+    AreaChart,
+    Area,
+    Legend
+} from "recharts";
 
 export default function DashboardPage() {
     return (
@@ -41,6 +59,42 @@ function DashboardContent() {
         if (n >= 1_000) return `$${(n / 1_000).toFixed(1)}K`;
         return `$${n.toFixed(2)}`;
     }
+
+    // Chart Data Generation
+    const topStockData = useMemo(() => {
+        return [...sampleProducts]
+            .sort((a, b) => b.stock - a.stock)
+            .slice(0, 5)
+            .map((p) => ({
+                name: p.name.split(" ")[0], // Shorten name for chart
+                stock: p.stock,
+            }));
+    }, []);
+
+    const categoryData = useMemo(() => {
+        const map = new Map<string, number>();
+        sampleProducts.forEach((p) => {
+            const val = map.get(p.category) || 0;
+            map.set(p.category, val + p.price * p.stock);
+        });
+        return Array.from(map.entries())
+            .map(([name, value]) => ({ name, value }))
+            .sort((a, b) => b.value - a.value);
+    }, []);
+
+    const COLORS = ["#6366f1", "#10b981", "#f59e0b", "#f43f5e", "#8b5cf6", "#06b6d4"];
+
+    const trendData = useMemo(() => {
+        // Mock 6-month historical data leading up to current total value
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+        let base = totalValue * 0.75;
+        return months.map((month, i) => {
+            if (i === months.length - 1) return { month, value: totalValue };
+            const variance = base * (Math.random() * 0.05 + 0.02);
+            base += variance;
+            return { month, value: Math.floor(base) };
+        });
+    }, [totalValue]);
 
     return (
         <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950">
@@ -114,6 +168,114 @@ function DashboardContent() {
                             </div>
                         </div>
                     )}
+
+                    {/* Analytics Charts Grid */}
+                    <div className="mt-8 grid gap-6 lg:grid-cols-2">
+                        {/* 6-Month Trend Area Chart */}
+                        <div className="col-span-1 lg:col-span-2 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                            <div className="mb-4 flex items-center gap-2">
+                                <TrendingIcon className="h-5 w-5 text-indigo-500" />
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                    6-Month Portfolio Value Trend
+                                </h2>
+                            </div>
+                            <div className="h-[300px] w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <AreaChart data={trendData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+                                        <defs>
+                                            <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+                                                <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" className="dark:opacity-20" />
+                                        <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} dy={10} />
+                                        <YAxis 
+                                            axisLine={false} 
+                                            tickLine={false} 
+                                            tick={{ fontSize: 12, fill: '#6b7280' }}
+                                            tickFormatter={(val) => `$${(val / 1000).toFixed(0)}k`}
+                                        />
+                                        <Tooltip 
+                                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                            formatter={(value: any) => [formatCurrency(Number(value)), "Total Value"]}
+                                        />
+                                        <Area type="monotone" dataKey="value" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+
+                        {/* Top 5 Stocked Commodities Bar Chart */}
+                        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                            <div className="mb-4 flex items-center gap-2">
+                                <BarChart3 className="h-5 w-5 text-emerald-500" />
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                    Top 5 Highest Volume
+                                </h2>
+                            </div>
+                            <div className="h-[300px] w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={topStockData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" className="dark:opacity-20" />
+                                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} dy={10} />
+                                        <YAxis 
+                                            axisLine={false} 
+                                            tickLine={false} 
+                                            tick={{ fontSize: 12, fill: '#6b7280' }}
+                                            tickFormatter={(val) => `${(val / 1000).toFixed(0)}k`}
+                                        />
+                                        <Tooltip 
+                                            cursor={{ fill: 'rgba(0,0,0,0.04)' }}
+                                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                            formatter={(value: any) => [Number(value).toLocaleString(), "Stock Level"]}
+                                        />
+                                        <Bar dataKey="stock" fill="#10b981" radius={[4, 4, 0, 0]} />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+
+                        {/* Value by Category Pie Chart */}
+                        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                            <div className="mb-4 flex items-center gap-2">
+                                <PieChartIcon className="h-5 w-5 text-amber-500" />
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                    Value by Category
+                                </h2>
+                            </div>
+                            <div className="h-[300px] w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={categoryData}
+                                            cx="50%"
+                                            cy="45%"
+                                            innerRadius={60}
+                                            outerRadius={90}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                            stroke="none"
+                                        >
+                                            {categoryData.map((entry: any, index: number) => (
+                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip 
+                                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                            formatter={(value: any) => [formatCurrency(Number(value)), "Value"]}
+                                        />
+                                        <Legend 
+                                            verticalAlign="bottom" 
+                                            height={36} 
+                                            iconType="circle"
+                                            wrapperStyle={{ fontSize: '12px', color: '#6b7280' }}
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+                    </div>
 
                     <div className="mt-8">
                         <div className="mb-4 flex items-center gap-2">
