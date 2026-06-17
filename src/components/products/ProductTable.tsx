@@ -23,6 +23,7 @@ import { getCategories, type Product } from "@/src/data/sampleProducts";
 import { exportProductsToCSV } from "@/src/utils/exportUtils";
 import ProductModal from "./ProductModal";
 import ScannerModal from "../scanner/ScannerModal";
+import { MapPin } from "lucide-react";
 
 type SortKey = keyof Pick<Product, "name" | "category" | "price" | "stock">;
 type SortDir = "asc" | "desc";
@@ -66,7 +67,10 @@ export default function ProductTable({
                     p.name.toLowerCase().includes(q) ||
                     p.id.toLowerCase().includes(q) ||
                     p.category.toLowerCase().includes(q) ||
-                    p.supplier.toLowerCase().includes(q)
+                    p.supplier.toLowerCase().includes(q) ||
+                    (p.location?.warehouse || "").toLowerCase().includes(q) ||
+                    (p.location?.aisle || "").toLowerCase().includes(q) ||
+                    (p.location?.bin || "").toLowerCase().includes(q)
             );
         }
 
@@ -148,6 +152,15 @@ export default function ProductTable({
         } else {
             alert(`Product with ID "${decodedText}" not found in inventory.`);
         }
+    }
+
+    function formatLocation(loc?: { warehouse: string; aisle: string; bin: string }) {
+        if (!loc || (!loc.warehouse && !loc.aisle && !loc.bin)) return "Unassigned";
+        const parts = [];
+        if (loc.aisle) parts.push(`Aisle ${loc.aisle}`);
+        if (loc.bin) parts.push(`Bin ${loc.bin}`);
+        const secondary = parts.length > 0 ? ` (${parts.join(", ")})` : "";
+        return `${loc.warehouse || "Unknown"}${secondary}`;
     }
 
     function SortIcon({ col }: { col: SortKey }) {
@@ -317,6 +330,7 @@ export default function ProductTable({
                                     <SortIcon col="stock" />
                                 </ThSortable>
                                 <Th className="hidden lg:table-cell">Supplier</Th>
+                                <Th className="hidden lg:table-cell">Location</Th>
                                 <Th className="hidden xl:table-cell">Updated</Th>
                                 <Th>Actions</Th>
                             </tr>
@@ -426,6 +440,12 @@ export default function ProductTable({
                                                             <td className="px-4 py-3 text-gray-500 dark:text-gray-400 hidden lg:table-cell">
                                                                 {p.supplier}
                                                             </td>
+                                                            <td className="px-4 py-3 text-gray-500 dark:text-gray-400 hidden lg:table-cell">
+                                                                <div className="flex items-center gap-1.5">
+                                                                    <MapPin className="h-3.5 w-3.5 opacity-60" />
+                                                                    {formatLocation(p.location)}
+                                                                </div>
+                                                            </td>
                                                             <td className="whitespace-nowrap px-4 py-3 text-gray-400 dark:text-gray-500 hidden xl:table-cell">
                                                                 {p.lastUpdated}
                                                             </td>
@@ -530,6 +550,12 @@ export default function ProductTable({
                                             </td>
                                             <td className="px-4 py-3 text-gray-500 dark:text-gray-400 hidden lg:table-cell">
                                                 {p.supplier}
+                                            </td>
+                                            <td className="px-4 py-3 text-gray-500 dark:text-gray-400 hidden lg:table-cell">
+                                                <div className="flex items-center gap-1.5">
+                                                    <MapPin className="h-3.5 w-3.5 opacity-60" />
+                                                    {formatLocation(p.location)}
+                                                </div>
                                             </td>
                                             <td className="whitespace-nowrap px-4 py-3 text-gray-400 dark:text-gray-500 hidden xl:table-cell">
                                                 {p.lastUpdated}

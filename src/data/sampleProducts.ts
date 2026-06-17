@@ -8,6 +8,11 @@ export interface Product {
     supplier: string;
     lastUpdated: string;
     minThreshold: number;
+    location?: {
+        warehouse: string;
+        aisle: string;
+        bin: string;
+    };
 }
 
 export const sampleProducts: Product[] = [
@@ -21,6 +26,7 @@ export const sampleProducts: Product[] = [
         supplier: "PetroGlobal Inc.",
         lastUpdated: "2026-03-05",
         minThreshold: 50,
+        location: { warehouse: "Main Depot", aisle: "A-1", bin: "Tank 4" },
     },
     {
         id: "COM-002",
@@ -32,6 +38,7 @@ export const sampleProducts: Product[] = [
         supplier: "GasLink Corp.",
         lastUpdated: "2026-03-04",
         minThreshold: 50,
+        location: { warehouse: "Main Depot", aisle: "A-2", bin: "Tank 8" },
     },
     {
         id: "COM-003",
@@ -43,6 +50,7 @@ export const sampleProducts: Product[] = [
         supplier: "AurumVault Ltd.",
         lastUpdated: "2026-03-06",
         minThreshold: 50,
+        location: { warehouse: "Vault 1", aisle: "VIP", bin: "Safe 3" },
     },
     {
         id: "COM-004",
@@ -54,6 +62,7 @@ export const sampleProducts: Product[] = [
         supplier: "SilverEdge Mining",
         lastUpdated: "2026-03-05",
         minThreshold: 50,
+        location: { warehouse: "Vault 1", aisle: "VIP", bin: "Safe 8" },
     },
     {
         id: "COM-005",
@@ -65,6 +74,7 @@ export const sampleProducts: Product[] = [
         supplier: "CopperWire Intl.",
         lastUpdated: "2026-03-03",
         minThreshold: 50,
+        location: { warehouse: "Warehouse B", aisle: "B-4", bin: "Pallet 12" },
     },
     {
         id: "COM-006",
@@ -76,6 +86,7 @@ export const sampleProducts: Product[] = [
         supplier: "GrainHarvest Co.",
         lastUpdated: "2026-03-06",
         minThreshold: 50,
+        location: { warehouse: "Silo North", aisle: "S-1", bin: "Bin 1" },
     },
     {
         id: "COM-007",
@@ -87,6 +98,7 @@ export const sampleProducts: Product[] = [
         supplier: "MidWest Agri",
         lastUpdated: "2026-03-05",
         minThreshold: 50,
+        location: { warehouse: "Silo North", aisle: "S-2", bin: "Bin 4" },
     },
     {
         id: "COM-008",
@@ -98,6 +110,7 @@ export const sampleProducts: Product[] = [
         supplier: "SoyPrime Farms",
         lastUpdated: "2026-03-04",
         minThreshold: 50,
+        location: { warehouse: "Silo South", aisle: "S-3", bin: "Bin 9" },
     },
     {
         id: "COM-009",
@@ -109,6 +122,7 @@ export const sampleProducts: Product[] = [
         supplier: "TextileSouth LLC",
         lastUpdated: "2026-03-02",
         minThreshold: 50,
+        location: { warehouse: "Warehouse C", aisle: "C-1", bin: "Rack 5" },
     },
     {
         id: "COM-010",
@@ -120,6 +134,7 @@ export const sampleProducts: Product[] = [
         supplier: "BeanOrigin Trade",
         lastUpdated: "2026-03-06",
         minThreshold: 50,
+        location: { warehouse: "Warehouse C", aisle: "C-2", bin: "Rack 8" },
     },
     {
         id: "COM-011",
@@ -131,6 +146,7 @@ export const sampleProducts: Product[] = [
         supplier: "SweetCane Global",
         lastUpdated: "2026-03-05",
         minThreshold: 50,
+        location: { warehouse: "Warehouse C", aisle: "C-3", bin: "Rack 12" },
     },
     {
         id: "COM-012",
@@ -142,6 +158,7 @@ export const sampleProducts: Product[] = [
         supplier: "NobleMetal Corp.",
         lastUpdated: "2026-03-04",
         minThreshold: 50,
+        location: { warehouse: "Vault 2", aisle: "Metals", bin: "Safe 1" },
     },
     {
         id: "COM-013",
@@ -153,6 +170,7 @@ export const sampleProducts: Product[] = [
         supplier: "NobleMetal Corp.",
         lastUpdated: "2026-03-03",
         minThreshold: 50,
+        location: { warehouse: "Vault 2", aisle: "Metals", bin: "Safe 2" },
     },
     {
         id: "COM-014",
@@ -164,6 +182,7 @@ export const sampleProducts: Product[] = [
         supplier: "TimberNorth Inc.",
         lastUpdated: "2026-03-06",
         minThreshold: 50,
+        location: { warehouse: "Yard East", aisle: "Y-1", bin: "Stack A" },
     },
     {
         id: "COM-015",
@@ -175,6 +194,7 @@ export const sampleProducts: Product[] = [
         supplier: "SteelSource Mining",
         lastUpdated: "2026-03-05",
         minThreshold: 50,
+        location: { warehouse: "Warehouse B", aisle: "B-5", bin: "Pallet 2" },
     },
     {
         id: "COM-016",
@@ -186,6 +206,7 @@ export const sampleProducts: Product[] = [
         supplier: "BatteryMineral Co.",
         lastUpdated: "2026-03-06",
         minThreshold: 50,
+        location: { warehouse: "Warehouse B", aisle: "B-6", bin: "Room 1" },
     },
     {
         id: "COM-017",
@@ -197,6 +218,7 @@ export const sampleProducts: Product[] = [
         supplier: "WestAfrican Cocoa",
         lastUpdated: "2026-03-04",
         minThreshold: 50,
+        location: { warehouse: "Warehouse C", aisle: "C-4", bin: "Rack 3" },
     },
     {
         id: "COM-018",
@@ -208,6 +230,7 @@ export const sampleProducts: Product[] = [
         supplier: "AsiaGrain Exports",
         lastUpdated: "2026-03-05",
         minThreshold: 50,
+        location: { warehouse: "Silo South", aisle: "S-4", bin: "Bin 2" },
     },
     {
         id: "COM-019",
@@ -219,6 +242,7 @@ export const sampleProducts: Product[] = [
         supplier: "LightAlloy Smelters",
         lastUpdated: "2026-03-03",
         minThreshold: 50,
+        location: { warehouse: "Warehouse B", aisle: "B-2", bin: "Pallet 8" },
     },
     {
         id: "COM-020",
@@ -230,6 +254,7 @@ export const sampleProducts: Product[] = [
         supplier: "NickelPure Refinery",
         lastUpdated: "2026-03-06",
         minThreshold: 50,
+        location: { warehouse: "Warehouse B", aisle: "B-3", bin: "Pallet 9" },
     },
 ];
 

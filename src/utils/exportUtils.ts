@@ -34,12 +34,18 @@ export function exportProductsToCSV(products: Product[]) {
         "Status",
         "Total Value",
         "Supplier",
+        "Location",
         "Last Updated"
     ];
 
     const rows = products.map((p) => {
         const isLow = p.stock <= p.minThreshold;
         const totalValue = p.price * p.stock;
+        const loc = p.location;
+        const locStr = loc && (loc.warehouse || loc.aisle || loc.bin)
+            ? `${loc.warehouse || "Unknown"} (Aisle ${loc.aisle || "-"}, Bin ${loc.bin || "-"})`
+            : "Unassigned";
+
         return [
             p.id,
             p.name,
@@ -51,6 +57,7 @@ export function exportProductsToCSV(products: Product[]) {
             isLow ? "Low Stock" : "OK",
             totalValue.toFixed(2),
             p.supplier,
+            locStr,
             p.lastUpdated
         ].map(escapeCSV).join(",");
     });

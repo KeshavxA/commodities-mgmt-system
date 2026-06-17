@@ -32,6 +32,9 @@ export default function ProductModal({
         minThreshold: "50",
         unit: "",
         supplier: "",
+        warehouse: "",
+        aisle: "",
+        bin: "",
     });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -46,6 +49,9 @@ export default function ProductModal({
                 minThreshold: String(product.minThreshold),
                 unit: product.unit,
                 supplier: product.supplier,
+                warehouse: product.location?.warehouse || "",
+                aisle: product.location?.aisle || "",
+                bin: product.location?.bin || "",
             });
         } else {
             setForm({
@@ -56,6 +62,9 @@ export default function ProductModal({
                 minThreshold: "50",
                 unit: "",
                 supplier: "",
+                warehouse: "",
+                aisle: "",
+                bin: "",
             });
         }
         setErrors({});
@@ -102,6 +111,14 @@ export default function ProductModal({
             minThreshold: parseInt(form.minThreshold, 10),
             unit: form.unit.trim(),
             supplier: form.supplier.trim(),
+            location:
+                form.warehouse.trim() || form.aisle.trim() || form.bin.trim()
+                    ? {
+                          warehouse: form.warehouse.trim(),
+                          aisle: form.aisle.trim(),
+                          bin: form.bin.trim(),
+                      }
+                    : undefined,
             lastUpdated: today,
         };
 
@@ -227,6 +244,35 @@ export default function ProductModal({
                             onChange={(v) => setForm((f) => ({ ...f, supplier: v }))}
                             placeholder="PetroGlobal Inc."
                         />
+                    </div>
+
+                    <div className="pt-2">
+                        <h3 className="mb-3 text-sm font-semibold text-gray-900 dark:text-white">
+                            Location (Optional)
+                        </h3>
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                            <Field
+                                id="product-warehouse"
+                                label="Warehouse"
+                                value={form.warehouse}
+                                onChange={(v) => setForm((f) => ({ ...f, warehouse: v }))}
+                                placeholder="Main Depot"
+                            />
+                            <Field
+                                id="product-aisle"
+                                label="Aisle"
+                                value={form.aisle}
+                                onChange={(v) => setForm((f) => ({ ...f, aisle: v }))}
+                                placeholder="A-4"
+                            />
+                            <Field
+                                id="product-bin"
+                                label="Bin"
+                                value={form.bin}
+                                onChange={(v) => setForm((f) => ({ ...f, bin: v }))}
+                                placeholder="B-12"
+                            />
+                        </div>
                     </div>
 
                     <div className="flex items-center justify-end gap-3 pt-2">
