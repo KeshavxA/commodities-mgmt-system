@@ -2,6 +2,7 @@ import { Check, X, Clock, FileText } from "lucide-react";
 import clsx from "clsx";
 import { useAuth } from "@/src/context/AuthContext";
 import { useOrders, type PurchaseOrder } from "@/src/context/OrderContext";
+import { useRBAC } from "@/src/context/RBACContext";
 import { formatDistanceToNow } from "@/src/utils/dateUtils";
 
 interface OrderTableProps {
@@ -11,12 +12,10 @@ interface OrderTableProps {
 export default function OrderTable({ orders }: OrderTableProps) {
     const { user } = useAuth();
     const { updateOrderStatus } = useOrders();
-    const isManager = user?.role === "Manager";
+    const { hasPermission } = useRBAC();
+    const canApprove = user ? hasPermission(user.role, "orders:approve") : false;
 
-    // Store Keepers only see their own requests unless we want them to see all.
-    // For this app, let's let Store Keepers see all requests, or filter by their email.
-    // Let's filter by email if Store Keeper.
-    const visibleOrders = isManager ? orders : orders.filter((o) => o.requestedBy === user?.email);
+    const visibleOrders = canApprove ? orders : orders.filter((o) => o.requestedBy === user?.email);
 
     if (visibleOrders.length === 0) {
         return (
@@ -28,7 +27,7 @@ export default function OrderTable({ orders }: OrderTableProps) {
                     No purchase orders found
                 </h3>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    {isManager
+                    {canApprove
                         ? "There are no pending restock requests to review."
                         : "You haven't submitted any restock requests yet."}
                 </p>
@@ -48,7 +47,7 @@ export default function OrderTable({ orders }: OrderTableProps) {
                             <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Requested By</th>
                             <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Date</th>
                             <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">Status</th>
-                            {isManager && (
+                            {canApprove && (
                                 <th className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100 text-right">Actions</th>
                             )}
                         </tr>
@@ -86,18 +85,18 @@ export default function OrderTable({ orders }: OrderTableProps) {
                                         {order.status}
                                     </span>
                                 </td>
-                                {isManager && (
+                                {canApprove && (
                                     <td className="px-6 py-4 text-right">
                                         {order.status === "PENDING" ? (
                                             <div className="flex items-center justify-end gap-2">
                                                 <button
-                                                    onClick={() => updateOrderStatus(order.id, "APPROVED", user)}
+                                                    onClick={() => updateOrderStatus(order.id, "APPROVED", user!)}
                                                     className="rounded-lg bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-600 transition-colors hover:bg-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/40"
                                                 >
                                                     Approve
                                                 </button>
                                                 <button
-                                                    onClick={() => updateOrderStatus(order.id, "REJECTED", user)}
+                                                    onClick={() => updateOrderStatus(order.id, "REJECTED", user!)}
                                                     className="rounded-lg bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40"
                                                 >
                                                     Reject
