@@ -99,14 +99,16 @@ export function OrderProvider({ children }: { children: ReactNode }) {
 
     const updateOrderStatus = useCallback((orderId: string, status: OrderStatus, user: User) => {
         setOrders((prev) => {
+            const order = prev.find(o => o.id === orderId);
+            const oldStatus = order?.status;
+            
             const updated = prev.map(o => o.id === orderId ? { ...o, status } : o);
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
             } catch {}
             
-            const order = prev.find(o => o.id === orderId);
-            if (order) {
-                logAction("UPDATE", `${status === "APPROVED" ? "Approved" : "Rejected"} restock order ${orderId} for ${order.productName}`, user);
+            if (order && oldStatus !== status) {
+                logAction("UPDATE", `Changed order ${orderId} status for ${order.productName} from ${oldStatus} to ${status}`, user);
             }
             
             return updated;

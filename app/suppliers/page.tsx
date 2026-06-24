@@ -37,11 +37,15 @@ function SuppliersContent() {
     }, []);
 
     function handleSave(supplier: Supplier) {
-        const isEditing = suppliers.some((s) => s.id === supplier.id);
+        const oldSupplier = suppliers.find((s) => s.id === supplier.id);
 
-        if (isEditing) {
+        if (oldSupplier) {
+            let details = `Updated supplier: ${supplier.name} (${supplier.id})`;
+            if (oldSupplier.status !== supplier.status) {
+                details = `Changed status of supplier ${supplier.name} from ${oldSupplier.status} to ${supplier.status}`;
+            }
             setSuppliers((prev) => prev.map((s) => (s.id === supplier.id ? supplier : s)));
-            if (user) logAction("UPDATE", `Updated supplier: ${supplier.name} (${supplier.id})`, user);
+            if (user) logAction("UPDATE", details, user);
         } else {
             setSuppliers((prev) => [supplier, ...prev]);
             if (user) logAction("CREATE", `Added new supplier: ${supplier.name} (${supplier.id})`, user);

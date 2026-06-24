@@ -41,10 +41,21 @@ function CommoditiesContent() {
     }
 
     function handleEdit(updated: Product) {
+        const oldProduct = products.find(p => p.id === updated.id);
+        let details = `Updated product "${updated.name}" (${updated.id})`;
+        
+        if (oldProduct) {
+            if (oldProduct.stock !== updated.stock) {
+                details = `Updated stock for ${updated.name} from ${oldProduct.stock} to ${updated.stock}`;
+            } else if (oldProduct.price !== updated.price) {
+                details = `Updated price for ${updated.name} from $${oldProduct.price} to $${updated.price}`;
+            }
+        }
+        
         setProducts((prev) =>
             prev.map((p) => (p.id === updated.id ? updated : p))
         );
-        logAction("UPDATE", `Updated product "${updated.name}" (${updated.id})`, user!);
+        logAction("UPDATE", details, user!);
     }
 
     function handleDelete(id: string) {
