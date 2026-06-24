@@ -5,21 +5,29 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/src/context/AuthContext";
 import { useLanguage } from "@/src/context/LanguageContext";
 import ThemeToggle from "@/src/components/ui/ThemeToggle";
-import { LogOut, User, ChevronDown } from "lucide-react";
+import { LogOut, User, ChevronDown, Bell, AlertTriangle } from "lucide-react";
 import clsx from "clsx";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { getLowStockProducts } from "@/src/data/sampleProducts";
 
 export default function Navbar() {
     const { user, logout } = useAuth();
     const { language, setLanguage, t } = useLanguage();
     const pathname = usePathname();
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [notifOpen, setNotifOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const notifRef = useRef<HTMLDivElement>(null);
+    
+    const lowStockItems = useMemo(() => getLowStockProducts(), []);
 
     useEffect(() => {
         function handleClick(e: MouseEvent) {
             if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
                 setDropdownOpen(false);
+            }
+            if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+                setNotifOpen(false);
             }
         }
         document.addEventListener("mousedown", handleClick);
@@ -63,6 +71,80 @@ export default function Navbar() {
                 </div>
 
                 <ThemeToggle />
+
+                {/* Notifications Bell */}
+                <div ref={notifRef} className="relative">
+                    <button
+                        type="button"
+                        onClick={() => setNotifOpen((v) => !v)}
+                        className={clsx(
+                            "relative flex h-9 w-9 items-center justify-center rounded-xl border transition-colors",
+                            "border-gray-200 bg-gray-50 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
+                        )}
+                    >
+                        <Bell className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                        {lowStockItems.length > 0 && (
+                            <span className="absolute right-2 top-2 flex h-2 w-2">
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                                <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500"></span>
+                            </span>
+                        )}
+                    </button>
+
+                    {notifOpen && (
+                        <div className="absolute right-0 mt-2 w-72 origin-top-right animate-in rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
+                            <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3 dark:border-gray-700">
+                                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                                    Notifications
+                                </h3>
+                                {lowStockItems.length > 0 && (
+                                    <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-600 dark:bg-red-900/30 dark:text-red-400">
+                                        {lowStockItems.length} New
+                                    </span>
+                                )}
+                            </div>
+                            <div className="max-h-64 overflow-y-auto py-2">
+                                {lowStockItems.length > 0 ? (
+                                    lowStockItems.map((item) => (
+                                        <div
+                                            key={item.id}
+                                            className="flex gap-3 px-4 py-2.5 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                                        >
+                                            <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
+                                                <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                                    {item.name} is low
+                                                </p>
+                                                <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                                                    Stock: {item.stock} {item.unit}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="px-4 py-6 text-center">
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                                            No new notifications
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                            {lowStockItems.length > 0 && (
+                                <div className="border-t border-gray-100 p-2 dark:border-gray-700">
+                                    <Link
+                                        href="/commodities"
+                                        onClick={() => setNotifOpen(false)}
+                                        className="block rounded-lg px-3 py-2 text-center text-xs font-medium text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-900/20"
+                                    >
+                                        View all commodities
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
 
                 {user && (
                     <div ref={dropdownRef} className="relative">
