@@ -30,6 +30,7 @@ function CommoditiesContent() {
     useEffect(() => {
         if (!isAuthenticated) {
             router.replace("/login");
+
         }
     }, [isAuthenticated, router]);
 
@@ -43,7 +44,7 @@ function CommoditiesContent() {
     function handleEdit(updated: Product) {
         const oldProduct = products.find(p => p.id === updated.id);
         let details = `Updated product "${updated.name}" (${updated.id})`;
-        
+
         if (oldProduct) {
             if (oldProduct.stock !== updated.stock) {
                 details = `Updated stock for ${updated.name} from ${oldProduct.stock} to ${updated.stock}`;
@@ -51,7 +52,7 @@ function CommoditiesContent() {
                 details = `Updated price for ${updated.name} from $${oldProduct.price} to $${updated.price}`;
             }
         }
-        
+
         setProducts((prev) =>
             prev.map((p) => (p.id === updated.id ? updated : p))
         );

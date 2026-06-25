@@ -12,6 +12,8 @@ import {
 import clsx from "clsx";
 import { useAuth } from "@/src/context/AuthContext";
 import { type Supplier } from "@/src/data/sampleSuppliers";
+import { exportSuppliersToCSV } from "@/src/utils/exportUtils";
+import { ArrowUp, Download } from "lucide-react";
 
 interface SupplierTableProps {
     suppliers: Supplier[];
@@ -19,6 +21,7 @@ interface SupplierTableProps {
     onEditSupplier: (supplier: Supplier) => void;
     onDeleteSupplier: (id: string) => void;
     onViewSupplier: (supplier: Supplier) => void;
+    onImportSuppliers?: (suppliers: Supplier[]) => void;
 }
 
 export default function SupplierTable({
@@ -27,6 +30,7 @@ export default function SupplierTable({
     onEditSupplier,
     onDeleteSupplier,
     onViewSupplier,
+    onImportSuppliers,
 }: SupplierTableProps) {
     const { user } = useAuth();
     const isManager = user?.role === "Manager";
@@ -44,6 +48,19 @@ export default function SupplierTable({
                 s.email.toLowerCase().includes(q)
         );
     }, [suppliers, search]);
+
+    async function handleImportClick(e: React.ChangeEvent<HTMLInputElement>) {
+        if (!e.target.files || e.target.files.length === 0 || !onImportSuppliers) return;
+        const file = e.target.files[0];
+        try {
+            const { importSuppliersFromCSV } = await import("@/src/utils/importUtils");
+            const parsed = await importSuppliersFromCSV(file);
+            onImportSuppliers(parsed);
+        } catch (err) {
+            alert("Failed to parse CSV file. Please make sure it is valid.");
+        }
+        e.target.value = "";
+    }
 
     return (
         <div>
@@ -67,14 +84,30 @@ export default function SupplierTable({
                 </div>
 
                 {isManager && (
-                    <button
-                        type="button"
-                        onClick={onAddSupplier}
-                        className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all hover:shadow-lg hover:shadow-indigo-500/30 active:scale-[0.98]"
-                    >
-                        <Plus className="h-4 w-4" />
-                        Add Supplier
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700">
+                            <input type="file" accept=".csv" className="hidden" onChange={handleImportClick} />
+                            <ArrowUp className="h-4 w-4" />
+                            <span className="hidden sm:inline">Import CSV</span>
+                        </label>
+                        <button
+                            type="button"
+                            onClick={() => exportSuppliersToCSV(filtered)}
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                        >
+                            <Download className="h-4 w-4" />
+                            <span className="hidden sm:inline">Export CSV</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onAddSupplier}
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all hover:shadow-lg hover:shadow-indigo-500/30 active:scale-[0.98]"
+                        >
+                            <Plus className="h-4 w-4" />
+                            <span className="hidden sm:inline">Add Supplier</span>
+                            <span className="sm:hidden">Add</span>
+                        </button>
+                    </div>
                 )}
             </div>
 

@@ -37,6 +37,7 @@ interface ProductTableProps {
     onAddProduct: (product: Product) => void;
     onEditProduct: (product: Product) => void;
     onDeleteProduct: (id: string) => void;
+    onImportProducts?: (products: Product[]) => void;
 }
 
 export default function ProductTable({
@@ -44,6 +45,7 @@ export default function ProductTable({
     onAddProduct,
     onEditProduct,
     onDeleteProduct,
+    onImportProducts,
 }: ProductTableProps) {
     const { user } = useAuth();
     const { hasPermission } = useRBAC();
@@ -164,6 +166,19 @@ export default function ProductTable({
         }
     }
 
+    async function handleImportClick(e: React.ChangeEvent<HTMLInputElement>) {
+        if (!e.target.files || e.target.files.length === 0 || !onImportProducts) return;
+        const file = e.target.files[0];
+        try {
+            const { importProductsFromCSV } = await import("@/src/utils/importUtils");
+            const parsed = await importProductsFromCSV(file);
+            onImportProducts(parsed);
+        } catch (err) {
+            alert("Failed to parse CSV file. Please make sure it is valid.");
+        }
+        e.target.value = ""; // Reset input so the same file can be uploaded again if needed
+    }
+
     function formatLocation(loc?: { warehouse: string; aisle: string; bin: string }) {
         if (!loc || (!loc.warehouse && !loc.aisle && !loc.bin)) return "Unassigned";
         const parts = [];
@@ -278,6 +293,13 @@ export default function ProductTable({
                                 >
                                     <ScanLine className="h-4 w-4" />
                                 </button>
+                                <label
+                                    className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-gray-200 bg-white p-2 text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                                    title="Import CSV"
+                                >
+                                    <input type="file" accept=".csv" className="hidden" onChange={handleImportClick} />
+                                    <ArrowUp className="h-4 w-4" />
+                                </label>
                                 <button
                                     type="button"
                                     onClick={() => exportProductsToCSV(filtered)}
@@ -310,6 +332,11 @@ export default function ProductTable({
                             <ScanLine className="h-4 w-4" />
                             Scan Barcode
                         </button>
+                        <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700">
+                            <input type="file" accept=".csv" className="hidden" onChange={handleImportClick} />
+                            <ArrowUp className="h-4 w-4" />
+                            Import CSV
+                        </label>
                         <button
                             type="button"
                             onClick={() => exportProductsToCSV(filtered)}

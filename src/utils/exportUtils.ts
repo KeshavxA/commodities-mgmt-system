@@ -1,4 +1,5 @@
 import { type Product } from "@/src/data/sampleProducts";
+import { type Supplier } from "@/src/data/sampleSuppliers";
 import { type AuditLog } from "@/src/context/AuditContext";
 
 function escapeCSV(val: any): string {
@@ -95,4 +96,31 @@ export function exportAuditLogsToCSV(logs: AuditLog[]) {
 
     const csvContent = [headers.join(","), ...rows].join("\n");
     triggerDownload(csvContent, `audit_logs_export_${new Date().toISOString().split('T')[0]}.csv`);
+}
+
+export function exportSuppliersToCSV(suppliers: Supplier[]) {
+    const headers = [
+        "ID",
+        "Name",
+        "Contact Person",
+        "Email",
+        "Phone",
+        "Status",
+        "Rating"
+    ];
+
+    const rows = suppliers.map((s) => {
+        return [
+            s.id,
+            s.name,
+            s.contactPerson,
+            s.email,
+            s.phone,
+            s.status,
+            s.rating
+        ].map(escapeCSV).join(",");
+    });
+
+    const csvContent = [headers.join(","), ...rows].join("\n");
+    triggerDownload(csvContent, `suppliers_export_${new Date().toISOString().split('T')[0]}.csv`);
 }

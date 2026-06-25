@@ -52,6 +52,28 @@ function SuppliersContent() {
         }
     }
 
+    function handleImport(importedSuppliers: Supplier[]) {
+        setSuppliers((prev) => {
+            let updatedCount = 0;
+            let addedCount = 0;
+            const updatedSuppliers = [...prev];
+
+            importedSuppliers.forEach(newSupplier => {
+                const existingIndex = updatedSuppliers.findIndex(s => s.id === newSupplier.id);
+                if (existingIndex !== -1) {
+                    updatedSuppliers[existingIndex] = newSupplier;
+                    updatedCount++;
+                } else {
+                    updatedSuppliers.push(newSupplier);
+                    addedCount++;
+                }
+            });
+
+            if (user) logAction("UPDATE", `Bulk imported CSV: ${addedCount} suppliers added, ${updatedCount} suppliers updated`, user);
+            return updatedSuppliers;
+        });
+    }
+
     function handleDelete(id: string) {
         const toDelete = suppliers.find((s) => s.id === id);
         if (toDelete) {
@@ -90,6 +112,7 @@ function SuppliersContent() {
                         onEditSupplier={setEditingSupplier}
                         onDeleteSupplier={handleDelete}
                         onViewSupplier={setViewingSupplier}
+                        onImportSuppliers={handleImport}
                     />
                 </main>
             </div>
