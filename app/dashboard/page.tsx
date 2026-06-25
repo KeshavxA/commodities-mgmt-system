@@ -334,8 +334,8 @@ function DashboardContent() {
                                         />
                                         <Tooltip
                                             contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                            formatter={(value: any, name: string) => {
-                                                const productIndex = parseInt(name.split('_')[1]);
+                                            formatter={(value: any, name: any) => {
+                                                const productIndex = parseInt(String(name).split('_')[1]);
                                                 const productName = atRiskProducts[productIndex]?.name || "Item";
                                                 return [value, productName];
                                             }}
@@ -346,8 +346,8 @@ function DashboardContent() {
                                             height={36}
                                             iconType="circle"
                                             wrapperStyle={{ fontSize: '12px', color: '#6b7280', paddingTop: '10px' }}
-                                            formatter={(value) => {
-                                                const idx = parseInt(value.split('_')[1]);
+                                            formatter={(value: any) => {
+                                                const idx = parseInt(String(value).split('_')[1]);
                                                 return atRiskProducts[idx]?.name.split(' ')[0] || value;
                                             }}
                                         />
