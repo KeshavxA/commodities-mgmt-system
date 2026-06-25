@@ -36,8 +36,12 @@ import {
     Cell,
     AreaChart,
     Area,
-    Legend
+    Legend,
+    LineChart,
+    Line,
+    ReferenceLine
 } from "recharts";
+import { Activity } from "lucide-react";
 
 export default function DashboardPage() {
     return (
@@ -60,13 +64,12 @@ function DashboardContent() {
         return `$${n.toFixed(2)}`;
     }
 
-    // Chart Data Generation
     const topStockData = useMemo(() => {
         return [...sampleProducts]
             .sort((a, b) => b.stock - a.stock)
             .slice(0, 5)
             .map((p) => ({
-                name: p.name.split(" ")[0], // Shorten name for chart
+                name: p.name.split(" ")[0],
                 stock: p.stock,
             }));
     }, []);
@@ -85,7 +88,7 @@ function DashboardContent() {
     const COLORS = ["#6366f1", "#10b981", "#f59e0b", "#f43f5e", "#8b5cf6", "#06b6d4"];
 
     const trendData = useMemo(() => {
-        // Mock 6-month historical data leading up to current total value
+
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
         let base = totalValue * 0.75;
         return months.map((month, i) => {
@@ -95,6 +98,33 @@ function DashboardContent() {
             return { month, value: Math.floor(base) };
         });
     }, [totalValue]);
+
+    const { forecastData, atRiskProducts } = useMemo(() => {
+
+        const forecastProducts = sampleProducts
+            .filter(p => p.stock > 0)
+            .map(p => {
+
+                const dailyConsumption = Math.max(1, Math.floor(p.stock * (Math.random() * 0.04 + 0.01)));
+                const daysUntilZero = Math.floor(p.stock / dailyConsumption);
+                return { ...p, dailyConsumption, daysUntilZero };
+            })
+            .sort((a, b) => a.daysUntilZero - b.daysUntilZero)
+            .slice(0, 5);
+
+        const days = Array.from({ length: 30 }, (_, i) => `Day ${i + 1}`);
+
+        const data = days.map((dayLabel, dayIndex) => {
+            const dataPoint: any = { day: dayLabel };
+            forecastProducts.forEach((p, i) => {
+                const projectedStock = Math.max(0, p.stock - (p.dailyConsumption * dayIndex));
+                dataPoint[`product_${i}`] = projectedStock;
+            });
+            return dataPoint;
+        });
+
+        return { forecastData: data, atRiskProducts: forecastProducts };
+    }, []);
 
     return (
         <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950">
@@ -169,9 +199,8 @@ function DashboardContent() {
                         </div>
                     )}
 
-                    {/* Analytics Charts Grid */}
                     <div className="mt-8 grid gap-6 lg:grid-cols-2">
-                        {/* 6-Month Trend Area Chart */}
+
                         <div className="col-span-1 lg:col-span-2 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
                             <div className="mb-4 flex items-center gap-2">
                                 <TrendingIcon className="h-5 w-5 text-indigo-500" />
@@ -190,13 +219,13 @@ function DashboardContent() {
                                         </defs>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" className="dark:opacity-20" />
                                         <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} dy={10} />
-                                        <YAxis 
-                                            axisLine={false} 
-                                            tickLine={false} 
+                                        <YAxis
+                                            axisLine={false}
+                                            tickLine={false}
                                             tick={{ fontSize: 12, fill: '#6b7280' }}
                                             tickFormatter={(val) => `$${(val / 1000).toFixed(0)}k`}
                                         />
-                                        <Tooltip 
+                                        <Tooltip
                                             contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                             formatter={(value: any) => [formatCurrency(Number(value)), "Total Value"]}
                                         />
@@ -206,7 +235,6 @@ function DashboardContent() {
                             </div>
                         </div>
 
-                        {/* Top 5 Stocked Commodities Bar Chart */}
                         <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
                             <div className="mb-4 flex items-center gap-2">
                                 <BarChart3 className="h-5 w-5 text-emerald-500" />
@@ -219,13 +247,13 @@ function DashboardContent() {
                                     <BarChart data={topStockData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" className="dark:opacity-20" />
                                         <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} dy={10} />
-                                        <YAxis 
-                                            axisLine={false} 
-                                            tickLine={false} 
+                                        <YAxis
+                                            axisLine={false}
+                                            tickLine={false}
                                             tick={{ fontSize: 12, fill: '#6b7280' }}
                                             tickFormatter={(val) => `${(val / 1000).toFixed(0)}k`}
                                         />
-                                        <Tooltip 
+                                        <Tooltip
                                             cursor={{ fill: 'rgba(0,0,0,0.04)' }}
                                             contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                             formatter={(value: any) => [Number(value).toLocaleString(), "Stock Level"]}
@@ -236,7 +264,6 @@ function DashboardContent() {
                             </div>
                         </div>
 
-                        {/* Value by Category Pie Chart */}
                         <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
                             <div className="mb-4 flex items-center gap-2">
                                 <PieChartIcon className="h-5 w-5 text-amber-500" />
@@ -261,18 +288,107 @@ function DashboardContent() {
                                                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                             ))}
                                         </Pie>
-                                        <Tooltip 
+                                        <Tooltip
                                             contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                             formatter={(value: any) => [formatCurrency(Number(value)), "Value"]}
                                         />
-                                        <Legend 
-                                            verticalAlign="bottom" 
-                                            height={36} 
+                                        <Legend
+                                            verticalAlign="bottom"
+                                            height={36}
                                             iconType="circle"
                                             wrapperStyle={{ fontSize: '12px', color: '#6b7280' }}
                                         />
                                     </PieChart>
                                 </ResponsiveContainer>
+                            </div>
+                        </div>
+
+                        <div className="col-span-1 lg:col-span-2 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                            <div className="mb-4 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                                <div className="flex items-center gap-2">
+                                    <Activity className="h-5 w-5 text-rose-500" />
+                                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                        30-Day Stock Depletion Forecast
+                                    </h2>
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                    Tracking top 5 fastest moving items
+                                </div>
+                            </div>
+                            <div className="h-[350px] w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={forecastData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" className="dark:opacity-20" />
+                                        <XAxis
+                                            dataKey="day"
+                                            axisLine={false}
+                                            tickLine={false}
+                                            tick={{ fontSize: 12, fill: '#6b7280' }}
+                                            dy={10}
+                                            minTickGap={20}
+                                        />
+                                        <YAxis
+                                            axisLine={false}
+                                            tickLine={false}
+                                            tick={{ fontSize: 12, fill: '#6b7280' }}
+                                        />
+                                        <Tooltip
+                                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                            formatter={(value: any, name: string) => {
+                                                const productIndex = parseInt(name.split('_')[1]);
+                                                const productName = atRiskProducts[productIndex]?.name || "Item";
+                                                return [value, productName];
+                                            }}
+                                            labelFormatter={(label) => `Forecast: ${label}`}
+                                        />
+                                        <Legend
+                                            verticalAlign="bottom"
+                                            height={36}
+                                            iconType="circle"
+                                            wrapperStyle={{ fontSize: '12px', color: '#6b7280', paddingTop: '10px' }}
+                                            formatter={(value) => {
+                                                const idx = parseInt(value.split('_')[1]);
+                                                return atRiskProducts[idx]?.name.split(' ')[0] || value;
+                                            }}
+                                        />
+                                        <ReferenceLine y={0} stroke="#ef4444" strokeDasharray="3 3" label={{ position: 'insideTopLeft', value: 'Zero Stock', fill: '#ef4444', fontSize: 12 }} />
+
+                                        {atRiskProducts.map((p, idx) => (
+                                            <Line
+                                                key={idx}
+                                                type="monotone"
+                                                dataKey={`product_${idx}`}
+                                                stroke={COLORS[idx % COLORS.length]}
+                                                strokeWidth={3}
+                                                dot={false}
+                                                activeDot={{ r: 6, strokeWidth: 0 }}
+                                            />
+                                        ))}
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </div>
+
+                            <div className="mt-6 rounded-xl border border-gray-100 bg-gray-50/50 p-4 dark:border-gray-800 dark:bg-gray-800/30">
+                                <h3 className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                    Physical Locations of At-Risk Items
+                                </h3>
+                                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                    {atRiskProducts.map((p, i) => (
+                                        <div key={i} className="flex items-start gap-2 text-sm">
+                                            <div className="mt-0.5 h-2 w-2 flex-shrink-0 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                                            <div>
+                                                <div className="font-medium text-gray-900 dark:text-white">{p.name}</div>
+                                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                                    {p.location ? (
+                                                        <span>{p.location.warehouse} &middot; Aisle {p.location.aisle} &middot; Bin {p.location.bin}</span>
+                                                    ) : (
+                                                        <span className="italic">Location not assigned</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -345,11 +461,11 @@ function DashboardContent() {
                                                     </td>
                                                 </tr>
                                             ))}
-                                           </tbody>
-                                  </table>
-                                 </div>
-                             </div>
-                           </div>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </main>
             </div>
         </div>
