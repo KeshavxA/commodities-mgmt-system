@@ -28,6 +28,8 @@ import { exportProductsToCSV } from "@/src/utils/exportUtils";
 import ProductModal from "./ProductModal";
 import ScannerModal from "../scanner/ScannerModal";
 import RestockModal from "./RestockModal";
+import PrintLabelModal from "./PrintLabelModal";
+import { Printer } from "lucide-react";
 
 type SortKey = keyof Pick<Product, "name" | "category" | "price" | "stock">;
 type SortDir = "asc" | "desc";
@@ -65,6 +67,7 @@ export default function ProductTable({
     const [scannerOpen, setScannerOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
     const [restockingProduct, setRestockingProduct] = useState<Product | null>(null);
+    const [printingProduct, setPrintingProduct] = useState<Product | null>(null);
 
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
@@ -549,6 +552,15 @@ export default function ProductTable({
                                                                             </button>
                                                                         )}
 
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => setPrintingProduct(p)}
+                                                                            className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-900/20 dark:hover:text-emerald-400"
+                                                                            title="Print QR Label"
+                                                                        >
+                                                                            <Printer className="h-4 w-4" />
+                                                                        </button>
+
                                                                         {canRequestRestock && (
                                                                             <button
                                                                                 type="button"
@@ -684,6 +696,15 @@ export default function ProductTable({
                                                             </button>
                                                         )}
                                                         
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setPrintingProduct(p)}
+                                                            className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-900/20 dark:hover:text-emerald-400"
+                                                            title="Print QR Label"
+                                                        >
+                                                            <Printer className="h-4 w-4" />
+                                                        </button>
+                                                        
                                                         {canRequestRestock && (
                                                             <button
                                                                 type="button"
@@ -726,6 +747,12 @@ export default function ProductTable({
                 isOpen={!!restockingProduct}
                 onClose={() => setRestockingProduct(null)}
                 product={restockingProduct}
+            />
+
+            <PrintLabelModal
+                isOpen={!!printingProduct}
+                onClose={() => setPrintingProduct(null)}
+                product={printingProduct}
             />
         </div>
     );
