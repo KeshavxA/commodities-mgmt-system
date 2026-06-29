@@ -19,6 +19,7 @@ import {
     Shield,
     Warehouse,
     Truck,
+    Activity,
 } from "lucide-react";
 import clsx from "clsx";
 import { useState, useEffect } from "react";
@@ -44,6 +45,13 @@ const navigation: NavItem[] = [
         name: "Commodities",
         href: "/commodities",
         icon: Boxes,
+        requiredPermissions: ["products:read"],
+    },
+    {
+        key: "ledger",
+        name: "Stock Ledger",
+        href: "/ledger",
+        icon: Activity,
         requiredPermissions: ["products:read"],
     },
     {

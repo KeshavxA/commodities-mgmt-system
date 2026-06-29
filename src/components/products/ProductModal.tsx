@@ -222,17 +222,28 @@ export default function ProductModal({
                             type="number"
                             step="0.01"
                         />
-                        <Field
-                            id="product-stock"
-                            label={form.batches.length > 0 ? "Stock (Auto-computed)" : "Stock"}
-                            value={form.stock}
-                            error={errors.stock}
-                            onChange={(v) => setForm((f) => ({ ...f, stock: v }))}
-                            placeholder="12000"
-                            type="number"
-                            step="1"
-                            disabled={form.batches.length > 0}
-                        />
+                        <div className="flex flex-col">
+                            <Field
+                                id="product-stock"
+                                label={
+                                    form.batches.length > 0 
+                                        ? "Stock (Auto-computed)" 
+                                        : isEdit 
+                                            ? "Stock (Read-Only)" 
+                                            : "Initial Stock"
+                                }
+                                value={form.stock}
+                                error={errors.stock}
+                                onChange={(v) => setForm((f) => ({ ...f, stock: v }))}
+                                placeholder="12000"
+                                type="number"
+                                step="1"
+                                disabled={isEdit || form.batches.length > 0}
+                            />
+                            {isEdit && form.batches.length === 0 && (
+                                <p className="mt-1 text-[10px] text-gray-500">Use "Adjust Stock" to modify.</p>
+                            )}
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">

@@ -5,14 +5,8 @@ import PermissionGuard from "@/src/components/auth/PermissionGuard";
 import { useAuth } from "@/src/context/AuthContext";
 import Navbar from "@/src/components/layout/Navbar";
 import Sidebar from "@/src/components/layout/Sidebar";
-import ProductTable from "@/src/components/products/ProductTable";
-import {
-    sampleProducts,
-    getTotalProducts,
-    getLowStockProducts,
-    getTotalValue,
-    getCategories,
-} from "@/src/data/sampleProducts";
+
+import { useProducts } from "@/src/context/ProductContext";
 import {
     Package,
     TrendingUp,
@@ -53,10 +47,12 @@ export default function DashboardPage() {
 
 function DashboardContent() {
     const { user } = useAuth();
-    const totalProducts = getTotalProducts();
-    const lowStockItems = getLowStockProducts();
-    const totalValue = getTotalValue();
-    const totalCategories = getCategories().length;
+    const { products } = useProducts();
+
+    const totalProducts = products.length;
+    const lowStockItems = products.filter((p) => p.stock <= p.minThreshold);
+    const totalValue = products.reduce((sum, p) => sum + p.price * p.stock, 0);
+    const totalCategories = new Set(products.map((p) => p.category)).size;
 
     function formatCurrency(n: number): string {
         if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
@@ -65,25 +61,25 @@ function DashboardContent() {
     }
 
     const topStockData = useMemo(() => {
-        return [...sampleProducts]
+        return [...products]
             .sort((a, b) => b.stock - a.stock)
             .slice(0, 5)
             .map((p) => ({
                 name: p.name.split(" ")[0],
                 stock: p.stock,
             }));
-    }, []);
+    }, [products]);
 
     const categoryData = useMemo(() => {
         const map = new Map<string, number>();
-        sampleProducts.forEach((p) => {
+        products.forEach((p) => {
             const val = map.get(p.category) || 0;
             map.set(p.category, val + p.price * p.stock);
         });
         return Array.from(map.entries())
             .map(([name, value]) => ({ name, value }))
             .sort((a, b) => b.value - a.value);
-    }, []);
+    }, [products]);
 
     const COLORS = ["#6366f1", "#10b981", "#f59e0b", "#f43f5e", "#8b5cf6", "#06b6d4"];
 

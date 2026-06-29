@@ -29,7 +29,7 @@ import ProductModal from "./ProductModal";
 import ScannerModal from "../scanner/ScannerModal";
 import RestockModal from "./RestockModal";
 import PrintLabelModal from "./PrintLabelModal";
-import { Printer } from "lucide-react";
+import { Printer, ArrowRightLeft } from "lucide-react";
 
 type SortKey = keyof Pick<Product, "name" | "category" | "price" | "stock">;
 type SortDir = "asc" | "desc";
@@ -40,6 +40,7 @@ interface ProductTableProps {
     onEditProduct: (product: Product) => void;
     onDeleteProduct: (id: string) => void;
     onImportProducts?: (products: Product[]) => void;
+    onAdjustStock?: (product: Product) => void;
 }
 
 export default function ProductTable({
@@ -48,6 +49,7 @@ export default function ProductTable({
     onEditProduct,
     onDeleteProduct,
     onImportProducts,
+    onAdjustStock,
 }: ProductTableProps) {
     const { user } = useAuth();
     const { hasPermission } = useRBAC();
@@ -541,6 +543,17 @@ export default function ProductTable({
                                                                             </button>
                                                                         )}
 
+                                                                        {onAdjustStock && canEdit && (
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => onAdjustStock(p)}
+                                                                                className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
+                                                                                title="Adjust Stock"
+                                                                            >
+                                                                                <ArrowRightLeft className="h-4 w-4" />
+                                                                            </button>
+                                                                        )}
+
                                                                         {canDelete && (
                                                                             <button
                                                                                 type="button"
@@ -682,6 +695,17 @@ export default function ProductTable({
                                                                 title="Edit product"
                                                             >
                                                                 <Pencil className="h-4 w-4" />
+                                                            </button>
+                                                        )}
+
+                                                        {onAdjustStock && canEdit && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => onAdjustStock(p)}
+                                                                className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
+                                                                title="Adjust Stock"
+                                                            >
+                                                                <ArrowRightLeft className="h-4 w-4" />
                                                             </button>
                                                         )}
 

@@ -6,6 +6,7 @@ import { LanguageProvider } from "@/src/context/LanguageContext";
 import { AuditProvider } from "@/src/context/AuditContext";
 import { OrderProvider } from "@/src/context/OrderContext";
 import { RBACProvider } from "@/src/context/RBACContext";
+import { ProductProvider } from "@/src/context/ProductContext";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -51,7 +52,9 @@ export default function RootLayout({
             <RBACProvider>
               <AuthProvider>
                 <AuditProvider>
-                  <OrderProvider>{children}</OrderProvider>
+                  <OrderProvider>
+                    <ProductProvider>{children}</ProductProvider>
+                  </OrderProvider>
                 </AuditProvider>
               </AuthProvider>
             </RBACProvider>

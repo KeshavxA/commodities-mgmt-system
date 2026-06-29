@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/src/context/AuthContext";
-import { useAudit } from "@/src/context/AuditContext";
+import { useProducts, type LedgerTransactionType } from "@/src/context/ProductContext";
 import Navbar from "@/src/components/layout/Navbar";
 import Sidebar from "@/src/components/layout/Sidebar";
 import ProductTable from "@/src/components/products/ProductTable";
-import { sampleProducts, type Product } from "@/src/data/sampleProducts";
+import StockAdjustmentModal from "@/src/components/products/StockAdjustmentModal";
+import { type Product } from "@/src/data/sampleProducts";
 import { Boxes } from "lucide-react";
 
 import PermissionGuard from "@/src/components/auth/PermissionGuard";
@@ -22,49 +23,40 @@ export default function CommoditiesPage() {
 
 function CommoditiesContent() {
     const { user, isAuthenticated } = useAuth();
-    const { logAction } = useAudit();
+    const { products, addProduct, updateProduct, deleteProduct, recordStockMovement } = useProducts();
     const router = useRouter();
 
-    const [products, setProducts] = useState<Product[]>(sampleProducts);
+    const [adjustingProduct, setAdjustingProduct] = useState<Product | null>(null);
 
     useEffect(() => {
         if (!isAuthenticated) {
             router.replace("/login");
-
         }
     }, [isAuthenticated, router]);
 
     if (!isAuthenticated || !user) return null;
 
     function handleAdd(product: Product) {
-        setProducts((prev) => [...prev, product]);
-        logAction("CREATE", `Created product "${product.name}" (${product.id})`, user!);
+        addProduct(product, user!);
     }
 
     function handleEdit(updated: Product) {
-        const oldProduct = products.find(p => p.id === updated.id);
-        let details = `Updated product "${updated.name}" (${updated.id})`;
-
-        if (oldProduct) {
-            if (oldProduct.stock !== updated.stock) {
-                details = `Updated stock for ${updated.name} from ${oldProduct.stock} to ${updated.stock}`;
-            } else if (oldProduct.price !== updated.price) {
-                details = `Updated price for ${updated.name} from $${oldProduct.price} to $${updated.price}`;
-            }
-        }
-
-        setProducts((prev) =>
-            prev.map((p) => (p.id === updated.id ? updated : p))
-        );
-        logAction("UPDATE", details, user!);
+        updateProduct(updated, user!);
     }
 
     function handleDelete(id: string) {
-        const product = products.find((p) => p.id === id);
-        if (product) {
-            logAction("DELETE", `Deleted product "${product.name}" (${id})`, user!);
+        deleteProduct(id, user!);
+    }
+
+    function handleAdjustStock(product: Product) {
+        setAdjustingProduct(product);
+    }
+
+    function handleSaveStockAdjustment(type: LedgerTransactionType, quantity: number, reference: string, notes: string) {
+        if (adjustingProduct) {
+            recordStockMovement(adjustingProduct.id, type, quantity, user!, reference, notes);
+            setAdjustingProduct(null);
         }
-        setProducts((prev) => prev.filter((p) => p.id !== id));
     }
 
     return (
@@ -96,7 +88,17 @@ function CommoditiesContent() {
                         onAddProduct={handleAdd}
                         onEditProduct={handleEdit}
                         onDeleteProduct={handleDelete}
+                        onAdjustStock={handleAdjustStock}
                     />
+                    
+                    {adjustingProduct && (
+                        <StockAdjustmentModal
+                            isOpen={true}
+                            onClose={() => setAdjustingProduct(null)}
+                            onSave={handleSaveStockAdjustment}
+                            product={adjustingProduct}
+                        />
+                    )}
                 </main>
             </div>
         </div>
