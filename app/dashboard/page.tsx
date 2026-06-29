@@ -97,7 +97,7 @@ function DashboardContent() {
 
     const { forecastData, atRiskProducts } = useMemo(() => {
 
-        const forecastProducts = sampleProducts
+        const forecastProducts = products
             .filter(p => p.stock > 0)
             .map(p => {
 
@@ -120,7 +120,7 @@ function DashboardContent() {
         });
 
         return { forecastData: data, atRiskProducts: forecastProducts };
-    }, []);
+    }, [products]);
 
     return (
         <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950">
@@ -419,7 +419,7 @@ function DashboardContent() {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-100 bg-white dark:divide-gray-800 dark:bg-gray-900">
-                                        {[...sampleProducts]
+                                        {[...products]
                                             .sort((a, b) => b.price * b.stock - a.price * a.stock)
                                             .slice(0, 5)
                                             .map((p, i) => (
