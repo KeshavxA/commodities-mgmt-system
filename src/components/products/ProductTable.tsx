@@ -29,6 +29,8 @@ import ProductModal from "./ProductModal";
 import ScannerModal from "../scanner/ScannerModal";
 import RestockModal from "./RestockModal";
 import PrintLabelModal from "./PrintLabelModal";
+import { useUSBScanner } from "@/src/hooks/useUSBScanner";
+import PrintLabelModal from "./PrintLabelModal";
 import { Printer, ArrowRightLeft } from "lucide-react";
 
 type SortKey = keyof Pick<Product, "name" | "category" | "price" | "stock">;
@@ -163,13 +165,20 @@ export default function ProductTable({
     }
 
     function handleScan(decodedText: string) {
-        const product = products.find((p) => p.id === decodedText);
+        const product = products.find((p) => p.id === decodedText || p.name === decodedText);
         if (product) {
-            handleEdit(product);
+            setSearch(product.id);
+            if (onAdjustStock && canEdit) {
+                onAdjustStock(product);
+            } else if (canEdit) {
+                handleEdit(product);
+            }
         } else {
-            alert(`Product with ID "${decodedText}" not found in inventory.`);
+            alert(`Product "${decodedText}" not found in inventory.`);
         }
     }
+
+    useUSBScanner(handleScan);
 
     async function handleImportClick(e: React.ChangeEvent<HTMLInputElement>) {
         if (!e.target.files || e.target.files.length === 0 || !onImportProducts) return;
@@ -288,79 +297,83 @@ export default function ProductTable({
                             </span>
                         </button>
 
-                        {canCreate && (
-                            <div className="flex items-center gap-2 sm:hidden">
-                                <button
-                                    type="button"
-                                    onClick={() => setScannerOpen(true)}
-                                    className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white p-2 text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
-                                    title="Scan Barcode"
-                                >
-                                    <ScanLine className="h-4 w-4" />
-                                </button>
-                                <label
-                                    className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-gray-200 bg-white p-2 text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
-                                    title="Import CSV"
-                                >
-                                    <input type="file" accept=".csv" className="hidden" onChange={handleImportClick} />
-                                    <ArrowUp className="h-4 w-4" />
-                                </label>
-                                <button
-                                    type="button"
-                                    onClick={() => exportProductsToCSV(filtered)}
-                                    className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white p-2 text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
-                                    title="Export to CSV"
-                                >
-                                    <Download className="h-4 w-4" />
-                                </button>
-                                <button
-                                    type="button"
-                                    id="add-product-btn-mobile"
-                                    onClick={handleAdd}
-                                    className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all hover:shadow-lg hover:shadow-indigo-500/30 active:scale-[0.98]"
-                                >
-                                    <Plus className="h-4 w-4" />
-                                    Add
-                                </button>
-                            </div>
-                        )}
+                        <div className="flex items-center gap-2 sm:hidden">
+                            <button
+                                type="button"
+                                onClick={() => setScannerOpen(true)}
+                                className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white p-2 text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                                title="Scan Barcode"
+                            >
+                                <ScanLine className="h-4 w-4" />
+                            </button>
+                            {canCreate && (
+                                <>
+                                    <label
+                                        className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-gray-200 bg-white p-2 text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                                        title="Import CSV"
+                                    >
+                                        <input type="file" accept=".csv" className="hidden" onChange={handleImportClick} />
+                                        <ArrowUp className="h-4 w-4" />
+                                    </label>
+                                    <button
+                                        type="button"
+                                        onClick={() => exportProductsToCSV(filtered)}
+                                        className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white p-2 text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                                        title="Export to CSV"
+                                    >
+                                        <Download className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        id="add-product-btn-mobile"
+                                        onClick={handleAdd}
+                                        className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all hover:shadow-lg hover:shadow-indigo-500/30 active:scale-[0.98]"
+                                    >
+                                        <Plus className="h-4 w-4" />
+                                        Add
+                                    </button>
+                                </>
+                            )}
+                        </div>
                     </div>
                 </div>
 
-                {canCreate && (
-                    <div className="hidden sm:flex items-center gap-3">
-                        <button
-                            type="button"
-                            onClick={() => setScannerOpen(true)}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
-                        >
-                            <ScanLine className="h-4 w-4" />
-                            Scan Barcode
-                        </button>
-                        <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700">
-                            <input type="file" accept=".csv" className="hidden" onChange={handleImportClick} />
-                            <ArrowUp className="h-4 w-4" />
-                            Import CSV
-                        </label>
-                        <button
-                            type="button"
-                            onClick={() => exportProductsToCSV(filtered)}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
-                        >
-                            <Download className="h-4 w-4" />
-                            Export CSV
-                        </button>
-                        <button
-                            type="button"
-                            id="add-product-btn"
-                            onClick={handleAdd}
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all hover:shadow-lg hover:shadow-indigo-500/30 active:scale-[0.98]"
-                        >
-                            <Plus className="h-4 w-4" />
-                            Add Product
-                        </button>
-                    </div>
-                )}
+                <div className="hidden sm:flex items-center gap-3">
+                    <button
+                        type="button"
+                        onClick={() => setScannerOpen(true)}
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                    >
+                        <ScanLine className="h-4 w-4" />
+                        Scan Barcode
+                    </button>
+                    {canCreate && (
+                        <>
+                            <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700">
+                                <input type="file" accept=".csv" className="hidden" onChange={handleImportClick} />
+                                <ArrowUp className="h-4 w-4" />
+                                Import CSV
+                            </label>
+                            <button
+                                type="button"
+                                onClick={() => exportProductsToCSV(filtered)}
+                                className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                            >
+                                <Download className="h-4 w-4" />
+                                Export CSV
+                            </button>
+                            <button
+                                type="button"
+                                id="add-product-btn"
+                                onClick={handleAdd}
+                                className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all hover:shadow-lg hover:shadow-indigo-500/30 active:scale-[0.98]"
+                            >
+                                <Plus className="h-4 w-4" />
+                                Add Product
+                            </button>
+                        </>
+                    )}
+                </div>
             </div>
 
             <div className="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800">
