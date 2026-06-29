@@ -1,10 +1,11 @@
 "use client";
 
+import { useState, useMemo } from "react";
 import PermissionGuard from "@/src/components/auth/PermissionGuard";
 import Navbar from "@/src/components/layout/Navbar";
 import Sidebar from "@/src/components/layout/Sidebar";
 import { useAudit } from "@/src/context/AuditContext";
-import { ClipboardCheck, Download } from "lucide-react";
+import { ClipboardCheck, Download, Search, Filter } from "lucide-react";
 import clsx from "clsx";
 import { exportAuditLogsToCSV } from "@/src/utils/exportUtils";
 
@@ -18,6 +19,19 @@ export default function AuditLogsPage() {
 
 function AuditLogsContent() {
     const { logs } = useAudit();
+    const [searchQuery, setSearchQuery] = useState("");
+    const [actionFilter, setActionFilter] = useState("All");
+
+    const filteredLogs = useMemo(() => {
+        return logs.filter((log) => {
+            const matchesSearch = 
+                log.details.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                log.userEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                log.role.toLowerCase().includes(searchQuery.toLowerCase());
+            const matchesAction = actionFilter === "All" || log.action === actionFilter;
+            return matchesSearch && matchesAction;
+        });
+    }, [logs, searchQuery, actionFilter]);
 
     function formatTime(isoString: string) {
         const d = new Date(isoString);
@@ -49,7 +63,7 @@ function AuditLogsContent() {
 
                 <main className="flex-1 p-6 lg:p-8">
                     <div className="mb-6">
-                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-900/20 shadow-sm">
                                     <ClipboardCheck className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
@@ -65,13 +79,56 @@ function AuditLogsContent() {
                             </div>
                             <button
                                 type="button"
-                                onClick={() => exportAuditLogsToCSV(logs)}
-                                disabled={logs.length === 0}
+                                onClick={() => exportAuditLogsToCSV(filteredLogs)}
+                                disabled={filteredLogs.length === 0}
                                 className="inline-flex w-fit items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
                             >
                                 <Download className="h-4 w-4" />
                                 Export Logs
                             </button>
+                        </div>
+
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="relative w-full sm:max-w-xs">
+                                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+                                <input
+                                    type="text"
+                                    placeholder="Search logs..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className={clsx(
+                                        "w-full rounded-xl border py-2 pl-9 pr-4 text-sm outline-none transition-all",
+                                        "bg-white dark:bg-gray-800/50",
+                                        "text-gray-900 dark:text-gray-100",
+                                        "border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200",
+                                        "dark:border-gray-700 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/40",
+                                        "placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                                    )}
+                                />
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <Filter className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                                <select
+                                    value={actionFilter}
+                                    onChange={(e) => setActionFilter(e.target.value)}
+                                    className={clsx(
+                                        "rounded-xl border px-3 py-2 text-sm outline-none transition-all",
+                                        "bg-white dark:bg-gray-800/50",
+                                        "text-gray-700 dark:text-gray-200",
+                                        "border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200",
+                                        "dark:border-gray-700 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/40"
+                                    )}
+                                >
+                                    <option value="All">All Actions</option>
+                                    <option value="CREATE">CREATE</option>
+                                    <option value="UPDATE">UPDATE</option>
+                                    <option value="DELETE">DELETE</option>
+                                </select>
+                                <span className="whitespace-nowrap text-xs text-gray-400 dark:text-gray-500 ml-2">
+                                    {filteredLogs.length} results
+                                </span>
+                            </div>
                         </div>
                     </div>
 
@@ -88,15 +145,15 @@ function AuditLogsContent() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                                    {logs.length === 0 ? (
+                                    {filteredLogs.length === 0 ? (
                                         <tr>
                                             <td colSpan={5} className="px-4 py-16 text-center text-gray-400 dark:text-gray-500">
                                                 <ClipboardCheck className="mx-auto h-8 w-8 opacity-20 mb-3" />
-                                                <p>No audit logs recorded yet.</p>
+                                                <p>No audit logs found.</p>
                                             </td>
                                         </tr>
                                     ) : (
-                                        logs.map((log) => (
+                                        filteredLogs.map((log) => (
                                             <tr key={log.id} className="transition-colors hover:bg-gray-50/60 dark:hover:bg-gray-800/40">
                                                 <td className="px-4 py-3"><ActionBadge action={log.action} /></td>
                                                 <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{log.details}</td>
