@@ -468,7 +468,11 @@ export default function ProductTable({
                                                                 {p.id}
                                                             </td>
                                                             <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100 max-w-[140px] sm:max-w-none break-words">
-                                                                {translateProductName(p.id, p.name)}
+                                                                <div>{translateProductName(p.id, p.name)}</div>
+                                                                <div className="mt-1 flex items-center gap-1 text-xs text-gray-500 lg:hidden">
+                                                                    <MapPin className="h-3 w-3" />
+                                                                    {formatLocation(p.location)}
+                                                                </div>
                                                             </td>
                                                             <td className="px-4 py-3 hidden md:table-cell">
                                                                 <span
