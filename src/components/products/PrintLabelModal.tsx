@@ -19,7 +19,7 @@ export default function PrintLabelModal({ isOpen, onClose, product }: PrintLabel
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm print:bg-white print:p-0 print:backdrop-blur-none">
-            {/* Modal Container - hidden during print so we only print the label */}
+           
             <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900 print:hidden">
                 <div className="mb-4 flex items-center justify-between">
                     <h2 className="text-xl font-bold text-gray-900 dark:text-white">Print Label</h2>
@@ -35,7 +35,7 @@ export default function PrintLabelModal({ isOpen, onClose, product }: PrintLabel
                     Verify the details below before printing. Make sure your printer is loaded with label stock.
                 </p>
 
-                {/* Preview Box */}
+       
                 <div className="mb-6 flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 p-8 dark:border-gray-800 dark:bg-gray-950">
                     <QRCodeSVG 
                         value={product.id} 
@@ -67,7 +67,6 @@ export default function PrintLabelModal({ isOpen, onClose, product }: PrintLabel
                 </div>
             </div>
 
-            {/* Printable Area - Only visible during printing */}
             <div className="hidden print:flex print:h-full print:w-full print:flex-col print:items-center print:justify-center print:bg-white print:text-black">
                 <div className="flex flex-col items-center text-center">
                     <QRCodeSVG 

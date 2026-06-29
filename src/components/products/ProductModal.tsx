@@ -4,6 +4,7 @@ import { useState, useEffect, type FormEvent } from "react";
 import { X, Plus, Trash2 } from "lucide-react";
 import clsx from "clsx";
 import { getCategories, type Product, type Batch } from "@/src/data/sampleProducts";
+import { sampleSuppliers } from "@/src/data/sampleSuppliers";
 import { useLanguage } from "@/src/context/LanguageContext";
 
 interface ProductModalProps {
@@ -255,14 +256,37 @@ export default function ProductModal({
                         />
                     </div>
                     <div>
-                        <Field
+                        <label
+                            htmlFor="product-supplier"
+                            className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                            Supplier
+                        </label>
+                        <select
                             id="product-supplier"
-                            label="Supplier"
                             value={form.supplier}
-                            error={errors.supplier}
-                            onChange={(v) => setForm((f) => ({ ...f, supplier: v }))}
-                            placeholder="PetroGlobal Inc."
-                        />
+                            onChange={(e) =>
+                                setForm((f) => ({ ...f, supplier: e.target.value }))
+                            }
+                            className={clsx(
+                                "w-full rounded-xl border px-3 py-2 text-sm outline-none transition-all",
+                                "bg-white dark:bg-gray-800/50",
+                                "text-gray-900 dark:text-gray-100",
+                                errors.supplier
+                                    ? "border-red-300 focus:border-red-400 focus:ring-2 focus:ring-red-200 dark:border-red-700"
+                                    : "border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/40"
+                            )}
+                        >
+                            <option value="">Select a supplier...</option>
+                            {sampleSuppliers.map((s) => (
+                                <option key={s.id} value={s.name}>
+                                    {s.name}
+                                </option>
+                            ))}
+                        </select>
+                        {errors.supplier && (
+                            <p className="mt-1 text-xs text-red-500">{errors.supplier}</p>
+                        )}
                     </div>
 
                     <div className="pt-2">
