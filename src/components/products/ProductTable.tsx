@@ -30,7 +30,6 @@ import ScannerModal from "../scanner/ScannerModal";
 import RestockModal from "./RestockModal";
 import PrintLabelModal from "./PrintLabelModal";
 import { useUSBScanner } from "@/src/hooks/useUSBScanner";
-import PrintLabelModal from "./PrintLabelModal";
 import { Printer, ArrowRightLeft } from "lucide-react";
 
 type SortKey = keyof Pick<Product, "name" | "category" | "price" | "stock">;
