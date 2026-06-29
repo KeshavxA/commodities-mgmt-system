@@ -74,7 +74,7 @@ export default function Navbar() {
     }
 
     return (
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white/80 pl-14 pr-6 backdrop-blur-md dark:border-gray-800 dark:bg-gray-900/80 lg:px-6">
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white/80 pl-14 pr-6 backdrop-blur-md dark:border-gray-800 dark:bg-gray-900/80 lg:px-6 print:hidden">
             <div className="flex items-center gap-3">
                 <span className="text-sm font-medium capitalize text-gray-500 dark:text-gray-400">
                     {getTitleFromPath(pathname)}

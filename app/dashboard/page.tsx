@@ -7,6 +7,7 @@ import Navbar from "@/src/components/layout/Navbar";
 import Sidebar from "@/src/components/layout/Sidebar";
 
 import { useProducts } from "@/src/context/ProductContext";
+import { exportProductsToCSV } from "@/src/utils/exportUtils";
 import {
     Package,
     TrendingUp,
@@ -15,6 +16,8 @@ import {
     BarChart3,
     PieChart as PieChartIcon,
     TrendingUp as TrendingIcon,
+    Download,
+    Printer,
 } from "lucide-react";
 import clsx from "clsx";
 import {
@@ -130,20 +133,38 @@ function DashboardContent() {
                 <Navbar />
 
                 <main className="flex-1 p-6 lg:p-8">
-                    <div className="mb-8">
-                        <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                            Dashboard
-                        </h1>
-                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            Welcome back,{" "}
-                            <span className="font-medium text-gray-700 dark:text-gray-300">
-                                {user?.email}
-                            </span>{" "}
-                            &middot;{" "}
-                            <span className="inline-flex items-center rounded-full bg-violet-100 px-2 py-0.5 text-xs font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-400">
-                                {user?.role}
-                            </span>
-                        </p>
+                    <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                                Dashboard
+                            </h1>
+                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                Welcome back,{" "}
+                                <span className="font-medium text-gray-700 dark:text-gray-300">
+                                    {user?.email}
+                                </span>{" "}
+                                &middot;{" "}
+                                <span className="inline-flex items-center rounded-full bg-violet-100 px-2 py-0.5 text-xs font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-400">
+                                    {user?.role}
+                                </span>
+                            </p>
+                        </div>
+                        <div className="flex gap-2 print:hidden">
+                            <button
+                                onClick={() => exportProductsToCSV(products)}
+                                className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                            >
+                                <Download className="h-4 w-4" />
+                                <span className="hidden sm:inline">Export CSV</span>
+                            </button>
+                            <button
+                                onClick={() => window.print()}
+                                className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                            >
+                                <Printer className="h-4 w-4" />
+                                <span className="hidden sm:inline">Print / PDF</span>
+                            </button>
+                        </div>
                     </div>
 
                     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">

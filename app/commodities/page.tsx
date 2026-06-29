@@ -9,7 +9,8 @@ import Sidebar from "@/src/components/layout/Sidebar";
 import ProductTable from "@/src/components/products/ProductTable";
 import StockAdjustmentModal from "@/src/components/products/StockAdjustmentModal";
 import { type Product } from "@/src/data/sampleProducts";
-import { Boxes } from "lucide-react";
+import { exportProductsToCSV } from "@/src/utils/exportUtils";
+import { Boxes, Download, Printer } from "lucide-react";
 
 import PermissionGuard from "@/src/components/auth/PermissionGuard";
 
@@ -67,7 +68,7 @@ function CommoditiesContent() {
                 <Navbar />
 
                 <main className="flex-1 p-6 lg:p-8">
-                    <div className="mb-6">
+                    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-3">
                             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-900/20">
                                 <Boxes className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
@@ -80,6 +81,22 @@ function CommoditiesContent() {
                                     Browse, search, and manage commodity products
                                 </p>
                             </div>
+                        </div>
+                        <div className="flex gap-2 print:hidden">
+                            <button
+                                onClick={() => exportProductsToCSV(products)}
+                                className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                            >
+                                <Download className="h-4 w-4" />
+                                <span className="hidden sm:inline">Export CSV</span>
+                            </button>
+                            <button
+                                onClick={() => window.print()}
+                                className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                            >
+                                <Printer className="h-4 w-4" />
+                                <span className="hidden sm:inline">Print / PDF</span>
+                            </button>
                         </div>
                     </div>
 

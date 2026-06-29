@@ -283,14 +283,14 @@ export default function Sidebar() {
 
             {mobileOpen && (
                 <div
-                    className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
+                    className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden print:hidden"
                     onClick={() => setMobileOpen(false)}
                 />
             )}
 
             <aside
                 className={clsx(
-                    "fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-gray-200 bg-white transition-transform duration-300 lg:hidden dark:border-gray-800 dark:bg-gray-900",
+                    "fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-gray-200 bg-white transition-transform duration-300 lg:hidden dark:border-gray-800 dark:bg-gray-900 print:hidden",
                     mobileOpen ? "translate-x-0" : "-translate-x-full"
                 )}
             >
@@ -299,7 +299,7 @@ export default function Sidebar() {
 
             <aside
                 className={clsx(
-                    "sticky top-0 hidden h-screen flex-col border-r border-gray-200 bg-white transition-all duration-300 lg:flex dark:border-gray-800 dark:bg-gray-900",
+                    "sticky top-0 hidden h-screen flex-col border-r border-gray-200 bg-white transition-all duration-300 lg:flex dark:border-gray-800 dark:bg-gray-900 print:hidden",
                     collapsed ? "w-[4.5rem]" : "w-60"
                 )}
             >
